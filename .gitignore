@@ -1,0 +1,44 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+
+# ===== قاعدة البيانات =====
+*.sqlite
+*.sqlite-journal
+/database/*.sqlite
+/database/*.sqlite-journal
+
+# ===== ملفات التخزين المؤقت =====
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*.log
+/storage/
+# ===== ملفات IDE =====
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== ملفات البيئة =====
+.env.*
+!.env.example
+
+# ===== ملفات النظام =====
+*.log
+*.cache
+*.tmp
