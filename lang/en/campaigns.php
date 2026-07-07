@@ -6,6 +6,7 @@ return [
     'emergency_heading' => 'Emergency Campaigns',
     'emergency_subheading' => 'Donate now and help save lives and alleviate suffering',
     'no_active' => 'No active campaigns at this time',
+    'no_completed' => 'No completed campaigns yet',
     'urgent' => 'URGENT',
     'donate_now' => 'Donate Now',
     'remaining_days' => ':days days remaining',
@@ -26,4 +27,10 @@ return [
     'donors' => 'donors',
     'goal_short' => 'of',
     'anonymous_donor' => 'Anonymous Donor',
+    'all' => 'All',
+    'active' => 'Active',
+    'active_campaigns' => 'Active Campaigns',
+    'completed' => 'Completed',
+    'completed_campaigns' => 'Completed Campaigns',
+    'view_details' => 'View Details',
 ];

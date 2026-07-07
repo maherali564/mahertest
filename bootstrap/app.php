@@ -23,7 +23,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'payment/webhook/*',
-            '*/emergency-campaigns/*/donate',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

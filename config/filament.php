@@ -14,6 +14,18 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the URI path where Filament's admin panel will be accessible from.
+    | The default is 'admin'.
+    |
+    */
+
+    'path' => env('FILAMENT_PATH', 'admin'),
+
     'broadcasting' => [
 
         // 'echo' => [

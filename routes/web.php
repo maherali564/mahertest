@@ -16,10 +16,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect('/'.config('app.locale', 'ar')));
 
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+Route::get('/rss.xml', [App\Http\Controllers\RssController::class, 'index'])->name('rss');
 
-Route::pattern('locale', implode('|', config('app.supported_locales', ['ar', 'en'])));
 
-Route::prefix('{locale}')
+Route::prefix('{locale}')->where(['locale' => implode('|', config('app.supported_locales', ['ar', 'en']))])
     ->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
@@ -30,6 +30,15 @@ Route::prefix('{locale}')
         Route::get('/transparency', [App\Http\Controllers\TransparencyController::class, 'index'])->name('transparency.index');
         Route::get('/stories', [StoryController::class, 'index'])->name('stories.index');
         Route::get('/stories/{id}', [StoryController::class, 'show'])->name('stories.show');
+
+        // Blog
+        Route::get('/blog', [App\Http\Controllers\Blog\PostController::class, 'index'])->name('posts.index');
+        Route::get('/blog/categories', [App\Http\Controllers\Blog\CategoryController::class, 'index'])->name('posts.categories');
+        Route::get('/blog/tags', [App\Http\Controllers\Blog\TagController::class, 'index'])->name('posts.tags');
+        Route::get('/blog/{slug}', [App\Http\Controllers\Blog\PostController::class, 'show'])->name('posts.show');
+        Route::get('/category/{slug}', [App\Http\Controllers\Blog\CategoryController::class, 'show'])->name('posts.category');
+        Route::get('/tag/{slug}', [App\Http\Controllers\Blog\TagController::class, 'show'])->name('posts.tag');
+
         Route::get('/donate/project/{slug}', [DonationController::class, 'projectPage'])->name('donate.project');
         Route::get('/donate/story/{id}', [DonationController::class, 'storyPage'])->name('donate.story');
         Route::get('/donate', [App\Http\Controllers\DonateController::class, 'index'])->name('donate.page');
@@ -54,7 +63,10 @@ Route::prefix('{locale}')
         Route::post('/payment/cancel/{donation}', [PaymentController::class, 'cancel'])->name('payment.cancel.post');
         Route::get('/payment/instructions/{donation}', [PaymentController::class, 'instructions'])->name('payment.instructions');
 
-        Route::get('/currency/rates', [App\Http\Controllers\CurrencyController::class, 'rates'])->name('currency.rates');
+                Route::get('/currency/rates', [App\Http\Controllers\CurrencyController::class, 'rates'])->name('currency.rates');
+
+                Route::get('/rss.xml', [App\Http\Controllers\RssController::class, 'showLocale'])->name('rss.locale');
+
     });
 
 Route::post('/payment/webhook/stripe', [WebhookController::class, 'stripe'])->name('payment.webhook.stripe')->middleware('throttle:60,1');

@@ -57,8 +57,9 @@
 
 
     @livewireScripts
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" nonce="{{ $cspNonce }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
+    <script src="{{ asset('js/video-lightbox.js') }}"></script>
     @stack('scripts')
 
     {{-- Cookie Consent Banner --}}

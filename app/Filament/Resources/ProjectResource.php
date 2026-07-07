@@ -30,6 +30,7 @@ class ProjectResource extends Resource
             Forms\Components\TextInput::make('slug')->label(__('filament.resources.project.slug')),
             static::localeTabs('title', __('filament.pages.manage_site_settings.about_title')),
             static::localeTabs('description', __('filament.resources.project.description'), 'textarea'),
+            static::localeTabs('excerpt', __('filament.resources.project.excerpt'), 'textarea'),
             static::localeTabs('content', __('filament.resources.project.content'), 'richtext'),
             Forms\Components\Select::make('program_id')
                 ->label(__('filament.resources.project.program'))
@@ -73,18 +74,6 @@ class ProjectResource extends Resource
                         ->nullable()
                         ->deleteUploadedFileUsing(fn ($file) => Storage::disk('public')->delete($file))
                         ->removeUploadedFileButtonPosition('right'),
-                    Forms\Components\Group::make([
-                        Forms\Components\TextInput::make('video_url')
-                            ->label(__('filament.resources.project.video_url'))
-                            ->url()
-                            ->placeholder('https://youtube.com/watch?v=...')
-                            ->nullable(),
-                        Forms\Components\Select::make('video_type')->label(__('filament.resources.project.video_type'))->options([
-                            'youtube' => 'YouTube',
-                            'vimeo' => 'Vimeo',
-                            'upload' => __('filament.resources.project.video_type_upload'),
-                        ])->placeholder(__('filament.resources.project.video_type_auto'))->nullable(),
-                    ])->columns(2),
                 ])->collapsible(),
             Forms\Components\Section::make(__('filament.resources.project.section.donation_counter'))
                 ->schema([

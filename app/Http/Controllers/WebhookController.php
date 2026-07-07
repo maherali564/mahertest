@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Donation;
+use App\Models\EmergencyDonation;
 use App\Models\PaymentGateway;
 use App\Services\Payment\PayPalService;
 use App\Services\Payment\StripeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
@@ -22,13 +24,14 @@ class WebhookController extends Controller
             return null;
         }
 
-        $existing = Donation::where('transaction_id', $transactionId)->first();
-        if ($existing && $existing->status === 'completed') {
-            Log::info('Duplicate webhook ignored', ['transaction_id' => $transactionId]);
-            return null;
-        }
-
-        return $existing;
+        return DB::transaction(function () use ($transactionId) {
+            $existing = Donation::where('transaction_id', $transactionId)->lockForUpdate()->first();
+            if ($existing && $existing->status === 'completed') {
+                Log::info('Duplicate webhook ignored', ['transaction_id' => $transactionId]);
+                return null;
+            }
+            return $existing;
+        });
     }
 
     /**
@@ -103,6 +106,13 @@ class WebhookController extends Controller
         Log::info('Stripe webhook received', ['type' => $type]);
 
         if ($type === 'checkout.session.completed') {
+            $metadata = $event['data']['object']['metadata'] ?? [];
+            $isEmergency = ($metadata['type'] ?? '') === 'emergency';
+
+            if ($isEmergency) {
+                return $this->handleEmergencyCheckoutCompleted($event);
+            }
+
             $sessionId = $event['data']['object']['id'] ?? '';
             $donation = $this->getIdempotencyCheck($sessionId);
             if (!$donation) {
@@ -157,6 +167,63 @@ class WebhookController extends Controller
         return response('OK', 200);
     }
 
+    private function handleEmergencyCheckoutCompleted(array $event): \Illuminate\Http\Response
+    {
+        $sessionId = $event['data']['object']['id'] ?? '';
+        $metadata = $event['data']['object']['metadata'] ?? [];
+        $emergencyDonationId = $metadata['emergency_donation_id'] ?? null;
+
+        if (!$emergencyDonationId) {
+            Log::warning('Emergency checkout missing donation_id in metadata', ['session_id' => $sessionId]);
+            return response('Missing donation_id', 400);
+        }
+
+        $donation = EmergencyDonation::find($emergencyDonationId);
+        if (!$donation) {
+            Log::warning('Emergency donation not found', ['donation_id' => $emergencyDonationId]);
+            return response('Donation not found', 404);
+        }
+
+        if ($donation->payment_status === 'completed') {
+            Log::info('Duplicate emergency webhook ignored', ['donation_id' => $donation->id]);
+            return response('OK', 200);
+        }
+
+        $amountReceived = ($event['data']['object']['amount_total'] ?? 0) / 100;
+        if ((int) round($amountReceived) !== (int) round((float) $donation->amount)) {
+            Log::warning('Emergency donation amount mismatch', [
+                'expected' => $donation->amount,
+                'received' => $amountReceived,
+                'donation_id' => $donation->id,
+            ]);
+            return response('Amount mismatch', 400);
+        }
+
+        $paymentIntentId = $event['data']['object']['payment_intent'] ?? null;
+        $donation->update([
+            'payment_status' => 'completed',
+            'stripe_payment_intent_id' => $paymentIntentId,
+        ]);
+
+        $campaign = $donation->campaign;
+        $newTotal = EmergencyDonation::where('emergency_campaign_id', $campaign->id)
+            ->where('payment_status', 'completed')
+            ->sum('converted_amount');
+        $donorCount = EmergencyDonation::where('emergency_campaign_id', $campaign->id)
+            ->where('payment_status', 'completed')
+            ->distinct('donor_email')
+            ->count('donor_email');
+
+        broadcast(new \App\Events\EmergencyDonationReceived($donation, $newTotal, $donorCount));
+
+        Log::info('Emergency donation completed via webhook', [
+            'donation_id' => $donation->id,
+            'campaign_id' => $campaign->id,
+        ]);
+
+        return response('OK', 200);
+    }
+
     /**
      * Handle PayPal webhook events: CHECKOUT.ORDER.APPROVED (one-time) and
      * PAYMENT.SALE.COMPLETED (recurring). Verifies signature via PayPal API,
@@ -201,7 +268,7 @@ class WebhookController extends Controller
                 $donation->update(['status' => 'completed']);
                 Log::info('Donation completed via PayPal webhook', ['donation_id' => $donation->id]);
             } else {
-                Log::warning('PayPal capture failed', ['order_id' => $orderId, 'capture' => $capture]);
+                Log::warning('PayPal capture failed', ['order_id' => $orderId, 'status' => $capture['status'] ?? 'unknown']);
             }
         }
 

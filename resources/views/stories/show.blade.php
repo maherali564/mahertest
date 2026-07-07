@@ -57,7 +57,14 @@
             }
         @endphp
         @php
-            $vThumbUrl = $story->image && Storage::disk('public')->exists($story->image) ? asset('storage/'.$story->image) : null;
+            $vThumbKey = $story->video_url ? ltrim($story->video_url, '/') : null;
+            $thumbnails = $story->video_thumbnails ?? [];
+            $vThumbPath = $vThumbKey && isset($thumbnails[$vThumbKey]) && Storage::disk('public')->exists($thumbnails[$vThumbKey])
+                ? $thumbnails[$vThumbKey]
+                : null;
+            $vThumbUrl = $vThumbPath
+                ? asset('storage/'.$vThumbPath)
+                : ($story->image && Storage::disk('public')->exists($story->image) ? asset('storage/'.$story->image) : null);
         @endphp
         <div class="media-grid__video" style="max-width:100%;margin:1.5rem 0;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="openVideoLightbox('{{ $videoSrc }}','{{ $vType }}')">
             <div class="media-grid__video-thumb" style="width:100%;height:100%;background:linear-gradient(135deg,#1e293b,#334155);display:flex;align-items:center;justify-content:center;">
@@ -68,13 +75,32 @@
             </div>
         </div>
         @endif
+        @foreach($story->videos ?? [] as $uploadedVideo)
+        @if($uploadedVideo !== $story->video_url && Storage::disk('public')->exists($uploadedVideo))
+        @php
+            $videoSrc = asset('storage/'.ltrim($uploadedVideo, '/'));
+            $thumbnails = $story->video_thumbnails ?? [];
+            $vThumb = isset($thumbnails[$uploadedVideo]) && Storage::disk('public')->exists($thumbnails[$uploadedVideo])
+                ? asset('storage/'.$thumbnails[$uploadedVideo])
+                : null;
+        @endphp
+        <div class="media-grid__video" style="max-width:100%;margin:1.5rem 0;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="openVideoLightbox('{{ $videoSrc }}','upload')">
+            <div class="media-grid__video-thumb" style="width:100%;height:100%;background:linear-gradient(135deg,#1e293b,#334155);display:flex;align-items:center;justify-content:center;">
+                @if($vThumb)<img loading="lazy" src="{{ $vThumb }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">@endif
+                <div style="position:relative;z-index:1;background:rgba(0,0,0,0.4);border-radius:50%;padding:16px;display:flex;align-items:center;justify-content:center;">
+                    <svg viewBox="0 0 24 24" width="64" height="64" fill="white"><polygon points="8,5 19,12 8,19"/></svg>
+                </div>
+            </div>
+        </div>
+        @endif
+        @endforeach
 
         <div class="story__meta" style="color:var(--color-text-muted);margin-bottom:1rem">
             @if($story->person_name)<span><strong>{{ __('common.full_name') }}:</strong> {{ trans_field($story, 'person_name') }}</span>@endif
             @if($story->age)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>العمر:</strong> {{ $story->age }}</span>@endif
             @if($story->location)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>الموقع:</strong> {{ trans_field($story, 'location') }}</span>@endif
         </div>
-        <div>{!! trans_field($story, 'content') !!}</div>
+        <div>{!! safe_html(trans_field($story, 'content')) !!}</div>
 
         @if($story->goal_amount > 0)
         <div class="donate-project__progress" style="margin:2rem 0">
@@ -242,7 +268,7 @@
 </style>
 
 <script nonce="{{ $cspNonce }}">
-const lightboxImages = {!! json_encode(array_map(fn($img) => asset('storage/'.$img), $allImages)) !!};
+const lightboxImages = @json(array_map(fn($img) => asset('storage/'.$img), $allImages));
 let currentIndex = 0;
 
 function openLightbox(index) {
@@ -270,26 +296,7 @@ function updateCounter() {
         (currentIndex + 1) + ' / ' + lightboxImages.length;
 }
 
-function openVideoLightbox(url, type) {
-    var c = document.getElementById('videoLightboxContainer');
-    if (type === 'youtube' || type === 'vimeo') {
-        c.innerHTML = '<iframe src="'+url+(type==='youtube'?'?autoplay=1':'?autoplay=1')+'" allow="autoplay; fullscreen" allowfullscreen></iframe>';
-    } else {
-        c.innerHTML = '<video controls autoplay muted playsinline style="width:100%;height:100%"><source src="'+url+'" type="video/mp4"></video>';
-    }
-    document.getElementById('videoLightbox').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeVideoLightbox(e) {
-    if (e && e.target !== e.currentTarget) return;
-    document.getElementById('videoLightboxContainer').innerHTML = '';
-    document.getElementById('videoLightbox').style.display = 'none';
-    document.body.style.overflow = '';
-}
-
 document.addEventListener('keydown', function(e) {
-    if (document.getElementById('videoLightbox').style.display === 'flex' && e.key === 'Escape') { closeVideoLightbox(); return; }
     if (document.getElementById('lightbox').style.display !== 'flex') return;
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowLeft' && {{ $isRtl ? 'false' : 'true' }}) navigateLightbox(-1);

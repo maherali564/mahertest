@@ -20,4 +20,5 @@ return [
     'our_programs_desc' => 'Acıyı hafifletmek için çeşitli yardım programlarında çalışıyoruz',
     'quick_links' => 'Hızlı bağlantılar',
     'follow_us' => 'Bizi takip edin',
+    'blog_posts_desc' => 'En son yazılar ve raporlar',
 ];

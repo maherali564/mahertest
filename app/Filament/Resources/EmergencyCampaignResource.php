@@ -37,6 +37,7 @@ class EmergencyCampaignResource extends Resource
                 ->schema([
                     static::localeTabs('title', __('filament.resources.emergency_campaign.title')),
                     static::localeTabs('description', __('filament.resources.emergency_campaign.description'), 'textarea'),
+                    static::localeTabs('excerpt', __('filament.resources.emergency_campaign.excerpt'), 'textarea'),
                 ])->columns(1),
 
             Section::make(__('filament.resources.emergency_campaign.section.target_currency'))

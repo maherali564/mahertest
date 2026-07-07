@@ -10,24 +10,11 @@ use Filament\Tables\Table;
 
 class ContactSubmissionResource extends Resource
 {
+    use \App\Filament\Concerns\HasPermissionBasedAuthorization;
+
     protected static ?string $model = ContactSubmission::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return auth()->user()?->can('view_any_contact_submission') ?? false;
-    }
-
-    public static function canView($record = null): bool
-    {
-        return auth()->user()?->can('view_contact_submission') ?? false;
-    }
 
     public static function table(Table $table): Table
     {

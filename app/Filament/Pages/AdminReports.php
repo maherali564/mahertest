@@ -49,10 +49,15 @@ class AdminReports extends Page
     /** Get chart data grouped by month or year for the selected period. */
     public function getChartData(): array
     {
+        $driver = DB::connection()->getDriverName();
+        $dateExpr = $this->period === 'yearly'
+            ? ($driver === 'pgsql' ? "TO_CHAR(created_at, 'YYYY')" : "strftime('%Y', created_at)")
+            : ($driver === 'pgsql' ? "TO_CHAR(created_at, 'YYYY-MM')" : "strftime('%Y-%m', created_at)");
+
         $query = Donation::completed()
             ->whereBetween('created_at', [$this->dateFrom, $this->dateTo])
             ->select(
-                DB::raw($this->period === 'yearly' ? "strftime('%Y', created_at) as period" : "strftime('%Y-%m', created_at) as period"),
+                DB::raw("$dateExpr as period"),
                 DB::raw('SUM(amount) as total'),
                 DB::raw('COUNT(*) as count')
             )

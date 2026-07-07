@@ -14,7 +14,7 @@ class Donation extends Model
         'project_id', 'post_id', 'story_id',
         'donated_at',
         'notes', 'locale',
-        'stripe_subscription_id', 'paypal_billing_agreement_id', 'access_token',
+        'stripe_subscription_id', 'paypal_billing_agreement_id',
     ];
 
     /**
@@ -32,6 +32,7 @@ class Donation extends Model
         'is_anonymous' => 'boolean',
         'is_recurring' => 'boolean',
         'donated_at' => 'datetime',
+        'confirmation_details' => 'array',
     ];
 
     /**

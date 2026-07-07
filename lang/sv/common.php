@@ -1,12 +1,13 @@
 <?php
 
 return [
-    'dev_notice' => 'Denna webbplats ?r under utveckling — all visad information ?r endast i testsyfte',
+    'dev_notice' => 'Denna webbplats ?r under utveckling ï¿½ all visad information ?r endast i testsyfte',
     'nav_home' => 'Hem',
     'nav_about' => 'Om oss',
     'nav_projects' => 'Projekt',
     'nav_programs' => 'Program',
     'nav_donate' => 'Donationer',
+    'nav_blog' => 'Blogg',
     'nav_contact' => 'Kontakt',
     'nav_stories' => 'R?ster som v?ntar p? liv',
     'nav_faq' => 'FAQ',

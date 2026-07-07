@@ -1,12 +1,13 @@
 <?php
 
 return [
-    'dev_notice' => 'Este sitio est? en desarrollo — toda la informaci?n mostrada es solo para fines de prueba',
+    'dev_notice' => 'Este sitio est? en desarrollo ï¿½ toda la informaci?n mostrada es solo para fines de prueba',
     'nav_home' => 'Inicio',
     'nav_about' => 'Sobre nosotros',
     'nav_projects' => 'Proyectos',
     'nav_programs' => 'Programas',
     'nav_donate' => 'Donaciones',
+    'nav_blog' => 'Blog',
     'nav_contact' => 'Contacto',
     'nav_stories' => 'Voces que esperan vida',
     'nav_faq' => 'Preguntas frecuentes',

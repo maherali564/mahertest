@@ -1,12 +1,13 @@
 <?php
 
 return [
-    'dev_notice' => 'Situs ini sedang dalam pengembangan — semua informasi yang ditampilkan hanya untuk tujuan pengujian',
+    'dev_notice' => 'Situs ini sedang dalam pengembangan ï¿½ semua informasi yang ditampilkan hanya untuk tujuan pengujian',
     'nav_home' => 'Beranda',
     'nav_about' => 'Tentang Kami',
     'nav_projects' => 'Proyek',
     'nav_programs' => 'Program',
     'nav_donate' => 'Donasi',
+    'nav_blog' => 'Blog',
     'nav_contact' => 'Kontak',
     'nav_stories' => 'Suara yang Menanti Kehidupan',
     'nav_faq' => 'FAQ',

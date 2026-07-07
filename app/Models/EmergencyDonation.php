@@ -12,6 +12,7 @@ class EmergencyDonation extends Model
         'amount', 'converted_amount', 'currency', 'payment_method', 'payment_status',
         'message', 'ip_address', 'user_agent',
         'donor_country', 'donor_city', 'donor_latitude', 'donor_longitude',
+        'stripe_session_id', 'stripe_payment_intent_id',
     ];
 
     protected $casts = [

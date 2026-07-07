@@ -1,11 +1,22 @@
 @extends('layouts.app')
 @php
+    use Illuminate\Support\Facades\Storage;
     $storyImagePaths = $story->images ?? [];
     if ($story->image && !in_array($story->image, $storyImagePaths)) {
         array_unshift($storyImagePaths, $story->image);
     }
     $allImages = $storyImagePaths;
     $mediaItems = collect();
+    $getThumb = function ($videoPath) use ($story) {
+        if (isset($story->video_thumbnails[$videoPath]) && Storage::disk('public')->exists($story->video_thumbnails[$videoPath])) {
+            return $story->video_thumbnails[$videoPath];
+        }
+        $thumbName = pathinfo($videoPath, PATHINFO_DIRNAME) . '/' . pathinfo($videoPath, PATHINFO_FILENAME) . '_thumb.jpg';
+        if (Storage::disk('public')->exists($thumbName)) {
+            return $thumbName;
+        }
+        return $story->image;
+    };
     foreach ($storyImagePaths as $img) {
         $mediaItems->push((object)['type' => 'image', 'path' => $img, 'thumbnail' => null, 'id' => 'img_'.str_replace(['/','\\','.'], '_', $img)]);
     }
@@ -14,13 +25,13 @@
         if (preg_match('/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/', $story->video_url, $m)) {
             $vThumb = 'https://img.youtube.com/vi/'.$m[1].'/hqdefault.jpg';
         } else {
-            $vThumb = $story->image;
+            $vThumb = $getThumb($story->video_url);
         }
         $mediaItems->push((object)['type' => 'video', 'path' => $story->video_url, 'thumbnail' => $vThumb, 'id' => 'video_main']);
     }
     foreach ($story->videos ?? [] as $v) {
         if ($v !== $story->video_url && !in_array($v, $story->images ?? [])) {
-            $vThumb = $story->image;
+            $vThumb = $getThumb($v);
             $mediaItems->push((object)['type' => 'video', 'path' => $v, 'thumbnail' => $vThumb, 'id' => 'video_'.md5($v)]);
         }
     }
@@ -93,7 +104,7 @@
                     @if($story->location)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>الموقع:</strong> {{ trans_field($story, 'location') }}</span>@endif
                 </div>
 
-                <div class="donate-project__description">{!! trans_field($story, 'content') !!}</div>
+                <div class="donate-project__description">{!! safe_html(trans_field($story, 'content')) !!}</div>
 
                 @if($story->goal_amount > 0)
                 <div class="donate-project__progress">
@@ -158,7 +169,7 @@
                             <select name="story_id" id="storySelect">
                                 <option value="">{{ __('donate.select_story') }}</option>
                                 @foreach($stories as $st)
-                                <option value="{{ $st->id }}">{{ trans_field($st, 'title') }}</option>
+                                <option value="{{ $st->id }}" data-id="{{ $st->id }}">{{ trans_field($st, 'title') }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -574,28 +585,8 @@ html, body { overflow-x: hidden; }
 
 @push('scripts')
 <script nonce="{{ $cspNonce }}">
-const lightboxImages = {!! json_encode(array_map(fn($img) => asset('storage/'.$img), $allImages)) !!};
+const lightboxImages = @json(array_map(fn($img) => asset('storage/'.$img), $allImages));
 let currentIndex = 0;
-
-function openVideoLightbox(url, type) {
-    var container = document.getElementById('videoLightboxContainer');
-    if (type === 'youtube' || type === 'vimeo') {
-        container.innerHTML = '<iframe src="' + url + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-    } else {
-        container.innerHTML = '<video controls autoplay muted playsinline src="' + url + '"></video>';
-        var v = container.querySelector('video');
-        if (v) v.play()['catch'](function(){});
-    }
-    document.getElementById('videoLightbox').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeVideoLightbox(e) {
-    if (e && e.target !== e.currentTarget) return;
-    document.getElementById('videoLightboxContainer').innerHTML = '';
-    document.getElementById('videoLightbox').style.display = 'none';
-    document.body.style.overflow = '';
-}
 
 function openLightbox(index) {
     currentIndex = index;
@@ -630,9 +621,6 @@ document.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft' && {{ $isRtl ? 'true' : 'false' }}) { navigateLightbox(1); return; }
         if (e.key === 'ArrowRight' && {{ $isRtl ? 'true' : 'false' }}) { navigateLightbox(-1); return; }
     }
-    if (document.getElementById('videoLightbox').style.display === 'flex') {
-        if (e.key === 'Escape') { closeVideoLightbox(); return; }
-    }
 });
 
 (function() {
@@ -651,7 +639,8 @@ document.addEventListener('keydown', function(e) {
 
     document.getElementById('storySelect').addEventListener('change', function() {
         if (this.value) {
-            window.location.href = '{{ url($currentLocale . "/donate/story") }}/' + this.value;
+            var id = this.options[this.selectedIndex].dataset.id;
+            window.location.href = '{{ route("donate.story", ["locale" => $currentLocale, "id" => "ID_PLACEHOLDER"]) }}'.replace('ID_PLACEHOLDER', id);
         }
     });
 

@@ -33,5 +33,8 @@
   .values-grid { grid-template-columns:1fr }
   .stats__grid { grid-template-columns:1fr }
 }
+@media (max-width: 767px) {
+  .lang-dropdown__menu .lang-name { display: inline; }
+}
 
 

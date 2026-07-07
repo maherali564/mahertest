@@ -2,18 +2,23 @@
 
 namespace App\Models;
 
+use App\Jobs\ProcessVideosJob;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Translatable\HasTranslations;
+
 class EmergencyCampaign extends Model
 {
     use HasFactory, SoftDeletes, HasTranslations;
 
     protected $fillable = [
-        'title', 'description',
-        'target_amount', 'currency', 'collected_amount', 'image', 'video', 'slug',
+        'title', 'description', 'excerpt',
+        'target_amount', 'currency', 'collected_amount', 'image', 'video', 'video_thumbnail', 'slug',
         'is_active', 'is_featured', 'starts_at', 'ends_at',
         'target_country', 'target_country_code', 'target_flag',
         'target_latitude', 'target_longitude', 'target_location',
@@ -30,13 +35,21 @@ class EmergencyCampaign extends Model
         'target_longitude' => 'decimal:7',
     ];
 
-    public array $translatable = ['title', 'description'];
+    public array $translatable = ['title', 'description', 'excerpt'];
 
     protected static function booted(): void
     {
         static::creating(function ($campaign) {
             if (empty($campaign->slug)) {
                 $campaign->slug = \Illuminate\Support\Str::slug($campaign->getTranslation('title', 'ar') ?: 'campaign-' . now()->timestamp);
+            }
+        });
+
+        static::saved(function ($campaign) {
+            if ($campaign->video) {
+                $campaign->convertHevcVideo();
+                $campaign->generateVideoThumbnail();
+                $campaign->saveQuietly();
             }
         });
     }
@@ -66,5 +79,75 @@ class EmergencyCampaign extends Model
     public function isActive(): bool
     {
         return $this->is_active && ($this->ends_at === null || now()->lt($this->ends_at));
+    }
+
+    public function convertHevcVideo(): void
+    {
+        if (!$this->video || str_starts_with($this->video, 'http')) return;
+
+        $ffmpeg = $this->ffmpegPath();
+        if (!$ffmpeg) return;
+
+        $videoPath = Storage::disk('public')->path($this->video);
+        if (!file_exists($videoPath)) return;
+
+        $probePath = escapeshellarg(config('services.ffmpeg.probe', 'ffprobe'));
+        $ffprobe = Process::timeout(30)->run("$probePath -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($videoPath) . ' 2>&1');
+        $codec = trim($ffprobe->output());
+        $isHevc = str_contains(strtolower($codec), 'hevc');
+        if (!$isHevc && empty($codec) && $ffmpeg) {
+            $detect = Process::timeout(30)->run("$ffmpeg -i " . escapeshellarg($videoPath) . ' 2>&1');
+            $isHevc = str_contains(strtolower($detect->output()), 'hevc');
+        }
+        if (!$isHevc) return;
+
+        $newName = pathinfo($this->video, PATHINFO_DIRNAME) . '/' . pathinfo($this->video, PATHINFO_FILENAME) . '_h264.mp4';
+        $newPath = Storage::disk('public')->path($newName);
+        $dir = dirname($newPath);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+        $conv = Process::timeout(300)->run("$ffmpeg -i " . escapeshellarg($videoPath) . " -c:v libx264 -crf 23 -preset medium -b:v 2M -maxrate 2.5M -bufsize 5M -c:a aac -b:a 96k -movflags +faststart " . escapeshellarg($newPath) . " 2>&1");
+        if ($conv->successful()) {
+            Storage::disk('public')->delete($this->video);
+            $this->video = $newName;
+        }
+    }
+
+    public function generateVideoThumbnail(): void
+    {
+        if (!$this->video || str_starts_with($this->video, 'http')) return;
+
+        $ffmpeg = $this->ffmpegPath();
+        if (!$ffmpeg) return;
+
+        if ($this->video_thumbnail && Storage::disk('public')->exists($this->video_thumbnail)) return;
+
+        $videoPath = Storage::disk('public')->path($this->video);
+        if (!file_exists($videoPath)) return;
+
+        $thumbName = pathinfo($this->video, PATHINFO_DIRNAME) . '/' . pathinfo($this->video, PATHINFO_FILENAME) . '_thumb.jpg';
+        $thumbPath = Storage::disk('public')->path($thumbName);
+        $dir = dirname($thumbPath);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+        if (file_exists($thumbPath)) {
+            $this->video_thumbnail = $thumbName;
+            return;
+        }
+
+        $thumb = Process::timeout(120)->run("$ffmpeg -i " . escapeshellarg($videoPath) . ' -ss 00:00:00.5 -vframes 1 -q:v 3 ' . escapeshellarg($thumbPath) . ' 2>&1');
+        if ($thumb->successful()) {
+            $this->video_thumbnail = $thumbName;
+        } else {
+            Log::warning('EmergencyCampaign thumbnail generation failed', ['campaign_id' => $this->id, 'video' => $this->video]);
+        }
+    }
+
+    public static function ffmpegPath(): ?string
+    {
+        $path = config('services.ffmpeg.path', 'ffmpeg');
+        if ($path !== 'ffmpeg') return escapeshellarg($path);
+        $result = Process::timeout(10)->run('ffmpeg -version 2>&1');
+        return $result->successful() ? 'ffmpeg' : null;
     }
 }

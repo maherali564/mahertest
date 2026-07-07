@@ -20,4 +20,5 @@ return [
     'our_programs_desc' => 'Vi arbetar med flera hjälpprogram för att lindra lidande',
     'quick_links' => 'Snabblänkar',
     'follow_us' => 'Följ oss',
+    'blog_posts_desc' => 'Senaste artiklarna och rapporterna',
 ];

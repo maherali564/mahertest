@@ -11,24 +11,11 @@ use Filament\Tables\Table;
 
 class DonationSubmissionResource extends Resource
 {
+    use \App\Filament\Concerns\HasPermissionBasedAuthorization;
+
     protected static ?string $model = DonationSubmission::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return auth()->user()?->can('view_any_donation_submission') ?? false;
-    }
-
-    public static function canEdit($record = null): bool
-    {
-        return auth()->user()?->can('edit_donation_submission') ?? false;
-    }
 
     public static function table(Table $table): Table
     {

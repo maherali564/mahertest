@@ -52,9 +52,10 @@
         <div class="ec-story-section">
             <h2 class="ec-section-title">قصة الحملة</h2>
             @if($campaign->video)
+            @php $ecThumb = $campaign->video_thumbnail ?: $campaign->image; @endphp
             <div style="margin-bottom:1.5rem;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="openVideoLightbox('{{ asset('storage/'.$campaign->video) }}')">
                 <div style="width:100%;height:100%;background:linear-gradient(135deg,#1e293b,#334155);display:flex;align-items:center;justify-content:center;">
-                    @if($campaign->image)<img loading="lazy" src="{{ asset('storage/'.$campaign->image) }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">@endif
+                    @if($ecThumb)<img loading="lazy" src="{{ asset('storage/'.$ecThumb) }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">@endif
                     <div style="position:relative;z-index:1;background:rgba(0,0,0,0.4);border-radius:50%;padding:16px;display:flex;align-items:center;justify-content:center;">
                         <svg viewBox="0 0 24 24" width="64" height="64" fill="white"><polygon points="8,5 19,12 8,19"/></svg>
                     </div>
@@ -92,10 +93,20 @@
 
 {{-- Lightbox Modal --}}
 <x-lightbox-modal />
-@endsection
 
-@push('scripts')
-<script nonce="{{ $cspNonce }}">function openVideoLightbox(url){var c=document.getElementById('videoLightboxContainer');c.innerHTML='<video controls autoplay muted playsinline style="width:100%;height:100%"><source src="'+url+'" type="video/mp4"></video>';document.getElementById('videoLightbox').style.display='flex';document.body.style.overflow='hidden';}
+<div id="videoLightbox" class="lightbox" onclick="closeVideoLightbox(event)" style="display:none">
+    <button class="lightbox__close" onclick="closeVideoLightbox()" aria-label="{{ __('common.close') }}">&times;</button>
+    <div id="videoLightboxContainer" class="lightbox__video-container"></div>
+</div>
+<style>
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center}
+.lightbox__close{position:absolute;top:16px;right:16px;z-index:10000;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:2rem;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.lightbox__close:hover{background:rgba(255,255,255,.3)}
+.lightbox__video-container{width:90%;max-width:900px;aspect-ratio:16/9;border-radius:8px;overflow:hidden}
+.lightbox__video-container iframe,.lightbox__video-container video{width:100%;height:100%;border:0}
+</style>
+
+<script nonce="{{ $cspNonce }}">
 document.addEventListener('DOMContentLoaded', function () {
     var mapData = document.getElementById('map-data');
     if (!mapData) return;
@@ -143,4 +154,4 @@ document.addEventListener('DOMContentLoaded', function () {
 var ec = new EmergencyCampaign({{ $campaign->id }}, '{{ app()->getLocale() }}');
 ec.init();
 </script>
-@endpush
+@endsection

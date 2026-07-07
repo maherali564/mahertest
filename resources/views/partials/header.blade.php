@@ -27,7 +27,6 @@
             <ul class="nav__list">
                 <li><a href="{{ route('home', ['locale' => $currentLocale]) }}#home" class="nav__link">{{ __('common.nav_home') }}</a></li>
                 <li><a href="{{ route('about.index', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('common.nav_about') }}</a></li>
-                <li><a href="{{ route('projects.index', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('common.nav_projects') }}</a></li>
                 <li class="nav__item nav__item--dropdown">
                     <a href="#" class="nav__link">{{ __('common.nav_programs') }} <i aria-hidden="true" class="fas fa-chevron-down nav__arrow"></i></a>
                     @php $navPrograms = \App\Models\Program::with('projects')->active()->get(); @endphp
@@ -52,9 +51,10 @@
                     </ul>
                     @endif
                 </li>
+                <li><a href="{{ route('projects.index', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('common.nav_projects') }}</a></li>
                 <li><a href="{{ route('stories.index', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('common.nav_stories') }}</a></li>
+                <li><a href="{{ route('posts.index', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('common.nav_blog') }}</a></li>
                 <li><a href="{{ route('volunteer.register', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('volunteer.nav') }}</a></li>
-                <li><a href="{{ route('home', ['locale' => $currentLocale]) }}#contact" class="nav__link">{{ __('common.nav_contact') }}</a></li>
                 <li><a href="{{ route('transparency.index', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('common.transparency') }}</a></li>
             </ul>
             <a href="{{ route('donate.page', ['locale' => $currentLocale]) }}" class="btn btn--primary btn--sm nav__cta" style="white-space:nowrap">{{ __('common.donate_now') }} <i aria-hidden="true" class="fas fa-heart" style="margin-inline-start:6px"></i></a>

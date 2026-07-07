@@ -53,7 +53,7 @@
         <img loading="lazy" src="{{ asset('storage/'.$project->image) }}" alt="" style="max-width:100%;border-radius:12px;margin:1.5rem 0">
         @endif
 
-        <div>{!! trans_field($project, 'content') ?: nl2br(e(trans_field($project, 'description'))) !!}</div>
+        <div>{!! safe_html(trans_field($project, 'content') ?: nl2br(e(trans_field($project, 'description')))) !!}</div>
 
         @if($project->goal_amount > 0)
         <div class="project-progress" style="margin:2rem 0">
@@ -143,14 +143,12 @@
 </style>
 
 <script nonce="{{ $cspNonce }}">
-const lightboxImages = {!! json_encode($imageItems->map(fn($i) => asset('storage/'.$i->path))->values()) !!};
+const lightboxImages = @json($imageItems->map(fn($i) => asset('storage/'.$i->path))->values());
 let currentIndex = 0;
 function openLightbox(index) { currentIndex=index; document.getElementById('lightbox').style.display='flex'; document.getElementById('lightbox-img').src=lightboxImages[index]; updateCounter(); document.body.style.overflow='hidden'; }
 function closeLightbox(e) { if(e&&e.target!==e.currentTarget) return; document.getElementById('lightbox').style.display='none'; document.body.style.overflow=''; }
 function navigateLightbox(dir) { currentIndex=(currentIndex+dir+lightboxImages.length)%lightboxImages.length; document.getElementById('lightbox-img').src=lightboxImages[currentIndex]; updateCounter(); }
 function updateCounter() { document.getElementById('lightbox-counter').textContent=(currentIndex+1)+' / '+lightboxImages.length; }
-function openVideoLightbox(url,type) { var c=document.getElementById('videoLightboxContainer'); if(type==='youtube'||type==='vimeo'){ c.innerHTML='<iframe src="'+url+'?autoplay=1" allow="autoplay;fullscreen" allowfullscreen></iframe>'; } else { c.innerHTML='<video controls autoplay muted playsinline style="width:100%;height:100%"><source src="'+url+'" type="video/mp4"></video>'; } document.getElementById('videoLightbox').style.display='flex'; document.body.style.overflow='hidden'; }
-function closeVideoLightbox(e) { if(e&&e.target!==e.currentTarget) return; document.getElementById('videoLightboxContainer').innerHTML=''; document.getElementById('videoLightbox').style.display='none'; document.body.style.overflow=''; }
-document.addEventListener('keydown',function(e){ if(document.getElementById('videoLightbox').style.display==='flex'&&e.key==='Escape'){ closeVideoLightbox(); return; } if(document.getElementById('lightbox').style.display!=='flex') return; if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft') navigateLightbox(-1); if(e.key==='ArrowRight') navigateLightbox(1); });
+document.addEventListener('keydown',function(e){ if(document.getElementById('lightbox').style.display!=='flex') return; if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft') navigateLightbox(-1); if(e.key==='ArrowRight') navigateLightbox(1); });
 </script>
 @endsection

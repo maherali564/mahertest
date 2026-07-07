@@ -7,6 +7,7 @@ return [
     'nav_projects' => 'Projects',
     'nav_programs' => 'Programs',
     'nav_donate' => 'Donations',
+    'nav_blog' => 'Blog',
     'nav_contact' => 'Contact',
     'nav_stories' => 'Voices Awaiting Life',
     'nav_faq' => 'FAQ',

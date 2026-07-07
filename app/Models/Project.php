@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Jobs\ProcessVideosJob;
 use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -12,18 +14,19 @@ class Project extends Model
     use HasTranslations;
 
     protected $fillable = [
-        'slug', 'title', 'description', 'content',
-        'image', 'images', 'video_url', 'video_type', 'videos', 'goal_amount', 'raised_amount',
+        'slug', 'title', 'description', 'content', 'excerpt',
+        'image', 'images', 'video_url', 'video_type', 'videos', 'video_thumbnails', 'goal_amount', 'raised_amount',
         'is_featured', 'sort_order', 'is_active', 'program_id',
     ];
 
-    public array $translatable = ['title', 'description', 'content'];
+    public array $translatable = ['title', 'description', 'content', 'excerpt'];
 
     protected $casts = [
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
         'images' => 'array',
         'videos' => 'array',
+        'video_thumbnails' => 'array',
         'goal_amount' => 'decimal:2',
         'raised_amount' => 'decimal:2',
     ];
@@ -118,7 +121,9 @@ class Project extends Model
             $legacyPaths = array_column($paths, 'path');
             $project->media()->whereNotIn('path', $legacyPaths)->delete();
 
-            dispatch(new \App\Jobs\ProcessVideosJob(Project::class, $project->id));
+            if (!empty($project->videos) || $project->video_url) {
+                ProcessVideosJob::dispatch(Project::class, $project->id);
+            }
         });
 
         static::deleted(function (Project $project) {
@@ -150,8 +155,9 @@ class Project extends Model
     public static function ffmpegPath(): ?string
     {
         $path = config('services.ffmpeg.path', 'ffmpeg');
-        if ($path !== 'ffmpeg') return $path;
-        return exec('ffmpeg -version 2>&1') ? 'ffmpeg' : null;
+        if ($path !== 'ffmpeg') return escapeshellarg($path);
+        $result = Process::timeout(10)->run('ffmpeg -version 2>&1');
+        return $result->successful() ? 'ffmpeg' : null;
     }
 
     public function convertHevcVideos(): void
@@ -164,17 +170,23 @@ class Project extends Model
             $videoPath = Storage::disk('public')->path($video);
             if (!file_exists($videoPath)) { $converted[] = $video; continue; }
 
-            exec("$ffmpeg -i " . escapeshellarg($videoPath) . ' 2>&1', $ffOut, $ffCode);
-            $isHevc = preg_grep('/hevc/i', $ffOut ?? []);
-            if (empty($isHevc)) { $converted[] = $video; continue; }
+            $probePath = escapeshellarg(config('services.ffmpeg.probe', 'ffprobe'));
+            $ffprobe = Process::timeout(30)->run("$probePath -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($videoPath) . ' 2>&1');
+            $codec = trim($ffprobe->output());
+            $isHevc = str_contains(strtolower($codec), 'hevc');
+            if (!$isHevc && empty($codec) && $ffmpeg) {
+                $detect = Process::timeout(30)->run("$ffmpeg -i " . escapeshellarg($videoPath) . ' 2>&1');
+                $isHevc = str_contains(strtolower($detect->output()), 'hevc');
+            }
+            if (!$isHevc) { $converted[] = $video; continue; }
 
             $newName = pathinfo($video, PATHINFO_DIRNAME) . '/' . pathinfo($video, PATHINFO_FILENAME) . '_h264.mp4';
             $newPath = Storage::disk('public')->path($newName);
             $dir = dirname($newPath);
             if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-            exec("$ffmpeg -i " . escapeshellarg($videoPath) . " -c:v libx264 -crf 28 -preset medium -b:v 2M -maxrate 2.5M -bufsize 5M -c:a aac -b:a 96k -movflags +faststart " . escapeshellarg($newPath) . " 2>&1", $output, $code);
-            if ($code === 0) {
+            $conv = Process::timeout(300)->run("$ffmpeg -i " . escapeshellarg($videoPath) . " -c:v libx264 -crf 23 -preset medium -b:v 2M -maxrate 2.5M -bufsize 5M -c:a aac -b:a 96k -movflags +faststart " . escapeshellarg($newPath) . " 2>&1");
+            if ($conv->successful()) {
                 Storage::disk('public')->delete($video);
                 $converted[] = $newName;
             } else {
@@ -207,8 +219,35 @@ class Project extends Model
             if (file_exists($thumbPath)) { $media->update(['thumbnail' => $thumbName]); continue; }
             if (!$ffmpeg) continue;
 
-            exec("$ffmpeg -i " . escapeshellarg($videoPath) . ' -ss 00:00:01 -vframes 1 -q:v 2 ' . escapeshellarg($thumbPath) . ' 2>&1', $output, $code);
-            if ($code === 0) $media->update(['thumbnail' => $thumbName]);
+            $thumb = Process::timeout(120)->run("$ffmpeg -i " . escapeshellarg($videoPath) . ' -ss 00:00:00.5 -vframes 1 -q:v 2 ' . escapeshellarg($thumbPath) . ' 2>&1');
+            if ($thumb->successful()) $media->update(['thumbnail' => $thumbName]);
+        }
+
+        $videos = $this->videos ?? [];
+        $thumbnails = $this->video_thumbnails ?? [];
+        $changed = false;
+
+        foreach ($videos as $video) {
+            if (str_starts_with($video, 'http')) continue;
+            if (isset($thumbnails[$video]) && Storage::disk('public')->exists($thumbnails[$video])) continue;
+
+            $videoPath = Storage::disk('public')->path($video);
+            if (!file_exists($videoPath)) continue;
+
+            $thumbName = pathinfo($video, PATHINFO_DIRNAME) . '/' . pathinfo($video, PATHINFO_FILENAME) . '_thumb.jpg';
+            $thumbPath = Storage::disk('public')->path($thumbName);
+            $dir = dirname($thumbPath);
+            if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+            if (file_exists($thumbPath)) { $thumbnails[$video] = $thumbName; $changed = true; continue; }
+            if (!$ffmpeg) continue;
+
+            $thumb = Process::timeout(120)->run("$ffmpeg -i " . escapeshellarg($videoPath) . ' -ss 00:00:00.5 -vframes 1 -q:v 2 ' . escapeshellarg($thumbPath) . ' 2>&1');
+            if ($thumb->successful()) { $thumbnails[$video] = $thumbName; $changed = true; }
+        }
+
+        if ($changed) {
+            $this->video_thumbnails = $thumbnails;
         }
     }
 }

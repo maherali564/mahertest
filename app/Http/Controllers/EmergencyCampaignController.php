@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmergencyDonation;
 use App\Services\EmergencyDonationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,7 +15,7 @@ class EmergencyCampaignController extends Controller
 
     public function index(?string $locale = null): View
     {
-        $campaigns = \App\Models\EmergencyCampaign::where('is_active', true)
+        $activeCampaigns = \App\Models\EmergencyCampaign::where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
             })
@@ -22,7 +23,16 @@ class EmergencyCampaignController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('emergency-campaigns.index', compact('campaigns'));
+        $completedCampaigns = \App\Models\EmergencyCampaign::where(function ($q) {
+                $q->where('is_active', false)
+                  ->orWhere(function ($q2) {
+                      $q2->whereNotNull('ends_at')->where('ends_at', '<=', now());
+                  });
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('emergency-campaigns.index', compact('activeCampaigns', 'completedCampaigns'));
     }
 
     public function show(?string $locale = null, string $slug): View
@@ -54,15 +64,36 @@ class EmergencyCampaignController extends Controller
             ?? $request->header('X-Forwarded-For')
             ?? $request->ip();
 
-        $donation = $this->donationService->donate($campaign, $validated, $ip);
+        $result = $this->donationService->donate($campaign, $validated, $ip);
+
+        $donation = $result['donation'];
+        $checkoutUrl = $result['checkout_url'];
+
+        if ($checkoutUrl) {
+            return response()->json([
+                'success' => true,
+                'checkout_url' => $checkoutUrl,
+                'donation_id' => $donation->id,
+                'message' => __('campaigns.redirecting_to_payment'),
+            ]);
+        }
 
         $campaign->refresh();
+        $newTotal = EmergencyDonation::where('emergency_campaign_id', $campaign->id)
+            ->where('payment_status', 'completed')
+            ->sum('converted_amount');
+        $donorCount = EmergencyDonation::where('emergency_campaign_id', $campaign->id)
+            ->where('payment_status', 'completed')
+            ->distinct('donor_email')
+            ->count('donor_email');
+
+        broadcast(new \App\Events\EmergencyDonationReceived($donation, $newTotal, $donorCount));
 
         return response()->json([
             'success' => true,
-            'new_total' => $campaign->collected_amount,
+            'new_total' => $newTotal,
             'progress_percent' => $campaign->progressPercent,
-            'donor_count' => $campaign->donorCount,
+            'donor_count' => $donorCount,
             'donation' => [
                 'id' => $donation->id,
                 'donor_name' => $donation->donorDisplayName(),

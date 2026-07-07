@@ -6,6 +6,7 @@ return [
     'emergency_heading' => 'حملات تبرعية عاجلة',
     'emergency_subheading' => 'تبرع الآن وساهم في إنقاذ الأرواح وتخفيف المعاناة',
     'no_active' => 'لا توجد حملات نشطة حالياً',
+    'no_completed' => 'لا توجد حملات مكتملة بعد',
     'urgent' => 'عاجل',
     'donate_now' => 'تبرع الآن',
     'remaining_days' => 'متبقي :days يوم',
@@ -26,4 +27,10 @@ return [
     'donors' => 'متبرع',
     'goal_short' => 'من',
     'anonymous_donor' => 'متبرع كريم',
+    'all' => 'الكل',
+    'active' => 'نشط',
+    'active_campaigns' => 'حملات نشطة',
+    'completed' => 'مكتمل',
+    'completed_campaigns' => 'حملات مكتملة',
+    'view_details' => 'عرض التفاصيل',
 ];

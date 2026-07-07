@@ -36,7 +36,7 @@
                 </div>
             </div>
             @empty
-            <div class="swiper-slide hero-slide" style="--slide-bg: linear-gradient(135deg, #0d6b4f, #083b2b)">
+            <div class="swiper-slide hero-slide" style="--slide-bg: linear-gradient(135deg, #0d6b4f 0%, #0a4a35 50%, #062218 100%)">
                 <div class="hero-slide__overlay"></div>
                 <div class="container hero-slide__content">
                     <h1 class="hero-slide__title" data-swiper-animate="fade-up">{{ trans_field($s, 'hero_title') }}</h1>
@@ -49,8 +49,7 @@
             @endforelse
         </div>
         <div class="swiper-pagination"></div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
+      
     </div>
 </section>
 
@@ -66,20 +65,6 @@
     </div>
 </section>
 
-
-{{-- Trust Mission --}}
-<section class="hm-section section section--sm">
-    <div class="container">
-        <div class="hm-header">
-            <div class="home-trust-icon"><i aria-hidden="true" class="fas fa-globe-asia"></i></div>
-            <h2 class="hm-title">{{ app()->getLocale() === 'ar' ? 'عطاؤكم يصل لكل مكان بالعالم' : 'your giving reaches every corner of the world' }}</h2>
-           
-        </div>
-        <div class="hm-map-wrap">
-            @include('partials.hero-map')
-        </div>
-    </div>
-</section>
 
 {{-- Emergency Campaigns --}}
 @php $emergencyCampaigns = \App\Models\EmergencyCampaign::where('is_active', true)->where(function($q){$q->whereNull('ends_at')->orWhere('ends_at','>',now());})->orderBy('is_featured','desc')->orderBy('created_at','desc')->get(); @endphp
@@ -110,6 +95,9 @@
                         </div>
                         <div style="padding:1rem">
                             <h3 style="font-size:.95rem;font-weight:700;margin-bottom:.35rem">{{ trans_field($ec, 'title') }}</h3>
+                            @if(trans_field($ec, 'excerpt'))
+                            <p style="font-size:.78rem;color:#64748b;margin-bottom:.5rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4">{{ trans_field($ec, 'excerpt') }}</p>
+                            @endif
                             <div class="progress-bar" style="height:6px;margin-bottom:.5rem"><div class="progress-bar__fill" style="width:{{$ec->progressPercent}}%;height:100%;background:linear-gradient(90deg,var(--color-danger),#f39c12)"></div></div>
                             <div style="display:flex;justify-content:space-between;font-size:.8rem">
                                 <span style="font-weight:700;color:var(--color-primary)">${{ number_format($ec->collected_amount,0) }}</span>
@@ -131,47 +119,28 @@
 </section>
 @endif
 
-{{-- Achievement Stats --}}
-<section class="stats stats--achievements" id="impact">
+{{-- Trust Mission --}}
+<section class="hm-section section section--sm">
     <div class="container">
-        <div class="trust-badge--hero"><i aria-hidden="true" class="fas fa-shield-halved"></i> {{ app()->getLocale() === 'ar' ? 'إنجازاتنا بفضل تبرعاتكم' : 'Our Achievements' }} <i aria-hidden="true" class="fas fa-circle-check"></i></div>
-        <p style="font-size:1.05rem;color:var(--color-primary);font-weight:600;margin-bottom:0.5rem">{{ app()->getLocale() === 'ar' ? 'أثر تبرعاتكم على الأرض' : 'The Impact of Your Donations on the Ground' }}</p>
-        <p style="max-width:600px;margin:0 auto 2rem;color:var(--color-text-muted);font-size:0.95rem">{{ app()->getLocale() === 'ar' ? 'إنجازات ملموسة تحققت بفضل دعمكم وتبرعاتكم السخية' : 'Tangible achievements made possible by your generous support and donations' }}</p>
-        <div class="impact-grid">
-            @foreach($achievementStats as $stat)
-            <div class="impact-card">
-                @if($stat->icon)<i aria-hidden="true" class="fas {{ $stat->icon }}" style="font-size:1.8rem;color:var(--color-primary);margin-bottom:0.75rem;display:block"></i>@endif
-                <span class="stat-item__number" data-count="{{ $stat->value }}" data-prefix="{{ $stat->prefix ?? '' }}">0</span>
-                <span class="stat-item__label">{{ trans_field($stat, 'label') }}</span>
-            </div>
-            @endforeach
+        <div class="hm-header">
+            <div class="home-trust-icon"><i aria-hidden="true" class="fas fa-globe-asia"></i></div>
+            <h2 class="hm-title">{{ app()->getLocale() === 'ar' ? 'عطاؤكم يصل لكل مكان بالعالم' : 'your giving reaches every corner of the world' }}</h2>
+           
+        </div>
+        <div class="hm-map-wrap">
+            @include('partials.hero-map')
         </div>
     </div>
 </section>
-
-@if($humanitarianStats->isNotEmpty())
-{{-- Gaza Humanitarian Stats --}}
-<section class="stats stats--humanitarian">
-    <div class="container">
-        <h2 class="section-title section-title--light">{{ __('home.humanitarian_stats') }}</h2>
-        <div class="stats__grid stats__grid--6">
-            @foreach($humanitarianStats as $stat)
-            <div class="stat-item stat-item--dark">
-                <span class="stat-item__number" data-count="{{ $stat->value }}" data-prefix="{{ $stat->prefix ?? '' }}">0</span>
-                <span class="stat-item__label">{{ trans_field($stat, 'label') }}</span>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
 
 {{-- Projects --}}
 <section class="projects section" id="projects">
     <div class="container">
-        <div class="section-header section-header--center">
-            <h2 class="section-title section-title--accent">{{ __('common.main_projects') }}</h2>
-            <a href="{{ route('projects.index', ['locale' => $currentLocale]) }}" class="link-more" style="display:inline-block;margin-top:8px">{{ __('common.view_all') }} <i aria-hidden="true" class="fas fa-arrow-{{ $isRtl ? 'left' : 'right' }}"></i></a>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <h2 class="section-title section-title--accent" style="margin-bottom:0">{{ __('common.main_projects') }}</h2>
+            <a href="{{ route('projects.index', ['locale' => $currentLocale]) }}" style="font-size:.85rem;color:var(--color-primary);font-weight:600;text-decoration:none">
+                {{ __('common.view_all') }} <i aria-hidden="true" class="fas fa-arrow-{{ $isRtl ? 'left' : 'right' }}"></i>
+            </a>
         </div>
         <div class="scroll-x">
             <div class="scroll-x__track" id="projectsTrack">
@@ -184,7 +153,9 @@
                     @endif
                     <div class="project-card__body">
                         <h3>{{ trans_field($project, 'title') }}</h3>
-                        <p>{{ trans_field($project, 'description') }}</p>
+                        @if(trans_field($project, 'excerpt'))
+                        <p style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;font-size:.85rem;color:#64748b">{{ trans_field($project, 'excerpt') }}</p>
+                        @endif
                         @if($project->goal_amount > 0 || ($project->raised_amount ?? 0) > 0)
                         <div class="project-progress">
                             <div class="progress-bar">
@@ -220,9 +191,14 @@
 @if($stories->isNotEmpty())
 <section class="stories section">
     <div class="container">
-        <div class="section-header section-header--center">
-            <h2 class="section-title section-title--accent">{{ __('common.nav_stories') }}</h2>
-            <p>{{ __('home.voices_waiting_desc') }}</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <div>
+                <h2 class="section-title section-title--accent" style="margin-bottom:0">{{ __('common.nav_stories') }}</h2>
+                <p style="margin:2px 0 0;font-size:.85rem;color:#64748b">{{ __('home.voices_waiting_desc') }}</p>
+            </div>
+            <a href="{{ route('stories.index', ['locale' => $currentLocale]) }}" style="font-size:.85rem;color:var(--color-primary);font-weight:600;text-decoration:none">
+                {{ __('common.view_all') }} <i aria-hidden="true" class="fas fa-arrow-{{ $isRtl ? 'left' : 'right' }}"></i>
+            </a>
         </div>
         <div class="scroll-x">
             <div class="scroll-x__track" id="storiesTrack">
@@ -233,6 +209,9 @@
                     @endif
                     <div class="story-card__body">
                         <h3>{{ trans_field($story, 'title') }}</h3>
+                        @if(trans_field($story, 'excerpt'))
+                        <p style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;font-size:.85rem;color:#64748b;margin-bottom:.35rem">{{ trans_field($story, 'excerpt') }}</p>
+                        @endif
                         <p>{{ trans_field($story, 'person_name') }}{{ $story->age ? ', '.$story->age.' '.__('common.age') : '' }}</p>
                         @if($story->goal_amount > 0 || ($story->raised_amount ?? 0) > 0)
                         <div class="project-progress" style="margin:8px 0">
@@ -263,7 +242,62 @@
 </section>
 @endif
 
+{{-- Latest Blog Posts --}}
+@if($latestPosts->isNotEmpty())
+<section class="section">
+    <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <div>
+                <h2 class="section-title" style="margin-bottom:0">{{ __('blog.latest_posts') }}</h2>
+                <p style="margin:2px 0 0;font-size:.85rem;color:#64748b">{{ __('home.blog_posts_desc') }}</p>
+            </div>
+            <a href="{{ route('posts.index', ['locale' => $currentLocale]) }}" style="font-size:.85rem;color:var(--color-primary);font-weight:600;text-decoration:none">
+                {{ __('common.view_all') }} <i aria-hidden="true" class="fas fa-arrow-{{ $isRtl ? 'left' : 'right' }}"></i>
+            </a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px">
+            @foreach($latestPosts as $post)
+            <article style="background:var(--color-bg);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+                <a href="{{ route('posts.show', ['locale' => $currentLocale, 'slug' => $post->slug]) }}">
+                    @if($post->featured_image)
+                    <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ trans_field($post, 'title') }}" style="width:100%;height:180px;object-fit:cover;display:block" loading="lazy">
+                    @else
+                    <div style="width:100%;height:180px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem"><i aria-hidden="true" class="fas fa-newspaper"></i></div>
+                    @endif
+                </a>
+                <div style="padding:16px">
+                    <h3 style="font-size:1rem;font-weight:700;margin-bottom:6px;line-height:1.4">
+                        <a href="{{ route('posts.show', ['locale' => $currentLocale, 'slug' => $post->slug]) }}" style="color:var(--color-text);text-decoration:none">{{ trans_field($post, 'title') }}</a>
+                    </h3>
+                    <div style="display:flex;gap:12px;font-size:0.75rem;color:var(--color-text-muted)">
+                        <span>{{ $post->published_at->diffForHumans() }}</span>
+                        <span><i aria-hidden="true" class="far fa-clock" style="margin-inline-end:2px"></i>{{ $post->reading_time }} {{ __('blog.minutes_read') }}</span>
+                    </div>
+                </div>
+            </article>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
+{{-- Achievement Stats --}}
+<section class="stats stats--achievements" id="impact">
+    <div class="container">
+        <div class="trust-badge--hero"><i aria-hidden="true" class="fas fa-shield-halved"></i> {{ app()->getLocale() === 'ar' ? 'إنجازاتنا بفضل تبرعاتكم' : 'Our Achievements' }} <i aria-hidden="true" class="fas fa-circle-check"></i></div>
+        <p style="font-size:1.05rem;color:var(--color-primary);font-weight:600;margin-bottom:0.5rem">{{ app()->getLocale() === 'ar' ? 'أثر تبرعاتكم على الأرض' : 'The Impact of Your Donations on the Ground' }}</p>
+        <p style="max-width:600px;margin:0 auto 2rem;color:var(--color-text-muted);font-size:0.95rem">{{ app()->getLocale() === 'ar' ? 'إنجازات ملموسة تحققت بفضل دعمكم وتبرعاتكم السخية' : 'Tangible achievements made possible by your generous support and donations' }}</p>
+        <div class="impact-grid">
+            @foreach($achievementStats as $stat)
+            <div class="impact-card">
+                @if($stat->icon)<i aria-hidden="true" class="fas {{ $stat->icon }}" style="font-size:1.8rem;color:var(--color-primary);margin-bottom:0.75rem;display:block"></i>@endif
+                <span class="stat-item__number" data-count="{{ $stat->value }}" data-prefix="{{ $stat->prefix ?? '' }}">0</span>
+                <span class="stat-item__label">{{ trans_field($stat, 'label') }}</span>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
 
 {{-- Donation Section --}}
 {{-- Contact Section --}}
@@ -293,34 +327,64 @@
                     <button type="submit" class="btn btn--primary">{{ __('common.send_message') }}</button>
                 </form>
             </div>
-            <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:2rem;box-shadow:var(--shadow-sm);border:1px solid var(--color-border)">
-                <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem"><i aria-hidden="true" class="fas fa-exclamation-triangle" style="color:var(--color-accent)"></i> {{ app()->getLocale() === 'ar' ? 'تقديم شكوى' : 'Submit a Complaint' }}</h3>
-                <p style="color:var(--color-text-muted);font-size:0.9rem;line-height:1.7;margin-bottom:1rem">{{ app()->getLocale() === 'ar' ? 'نحرص على الاستماع لملاحظاتكم وشكاويكم لتحسين خدماتنا. يمكنكم تقديم شكوى وسيتم الرد عليها في أقرب وقت.' : 'We value your feedback. Submit a complaint and we will respond as soon as possible.' }}</p>
-                <a href="{{ route('complaints.create', ['locale' => $currentLocale]) }}" class="btn btn--primary" style="display:inline-flex;align-items:center;gap:0.5rem">
-                    <i aria-hidden="true" class="fas fa-pen"></i> {{ app()->getLocale() === 'ar' ? 'تقديم شكوى' : 'Submit Complaint' }}
-                </a>
-                @if($s->whatsapp || $s->email || $s->phone)
-                <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--color-border)">
-                    <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:0.75rem;color:var(--color-text-muted)">{{ app()->getLocale() === 'ar' ? 'معلومات التواصل' : 'Contact Info' }}</h4>
-                    @if($s->whatsapp)
-                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $s->whatsapp) }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;color:var(--color-text);text-decoration:none;font-size:0.85rem" target="_blank">
-                        <i aria-hidden="true" class="fab fa-whatsapp" style="color:#25D366;width:20px;text-align:center"></i> {{ $s->whatsapp }}
+            <div style="display:flex;flex-direction:column;gap:1.5rem">
+                <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:2rem;box-shadow:var(--shadow-sm);border:1px solid var(--color-border)">
+                    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem"><i aria-hidden="true" class="fas fa-exclamation-triangle" style="color:var(--color-accent)"></i> {{ app()->getLocale() === 'ar' ? 'تقديم شكوى' : 'Submit a Complaint' }}</h3>
+                    <p style="color:var(--color-text-muted);font-size:0.9rem;line-height:1.7;margin-bottom:1rem">{{ app()->getLocale() === 'ar' ? 'نحرص على الاستماع لملاحظاتكم وشكاويكم لتحسين خدماتنا. يمكنكم تقديم شكوى وسيتم الرد عليها في أقرب وقت.' : 'We value your feedback. Submit a complaint and we will respond as soon as possible.' }}</p>
+                    <a href="{{ route('complaints.create', ['locale' => $currentLocale]) }}" class="btn btn--primary" style="display:inline-flex;align-items:center;gap:0.5rem">
+                        <i aria-hidden="true" class="fas fa-pen"></i> {{ app()->getLocale() === 'ar' ? 'تقديم شكوى' : 'Submit Complaint' }}
                     </a>
-                    @endif
-                    @if($s->email)
-                    <a href="mailto:{{ $s->email }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;color:var(--color-text);text-decoration:none;font-size:0.85rem">
-                        <i aria-hidden="true" class="fas fa-envelope" style="color:var(--color-primary);width:20px;text-align:center"></i> {{ $s->email }}
-                    </a>
-                    @endif
-                    @if($s->phone)
-                    <a href="tel:{{ preg_replace('/\s+/', '', $s->phone) }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;color:var(--color-text);text-decoration:none;font-size:0.85rem">
-                        <i aria-hidden="true" class="fas fa-phone" style="color:var(--color-primary);width:20px;text-align:center"></i> {{ $s->phone }}
-                    </a>
+                    @if($s->whatsapp || $s->email || $s->phone)
+                    <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--color-border)">
+                        <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:0.75rem;color:var(--color-text-muted)">{{ app()->getLocale() === 'ar' ? 'معلومات التواصل' : 'Contact Info' }}</h4>
+                        @if($s->whatsapp)
+                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $s->whatsapp) }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;color:var(--color-text);text-decoration:none;font-size:0.85rem" target="_blank">
+                            <i aria-hidden="true" class="fab fa-whatsapp" style="color:#25D366;width:20px;text-align:center"></i> {{ $s->whatsapp }}
+                        </a>
+                        @endif
+                        @if($s->email)
+                        <a href="mailto:{{ $s->email }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;color:var(--color-text);text-decoration:none;font-size:0.85rem">
+                            <i aria-hidden="true" class="fas fa-envelope" style="color:var(--color-primary);width:20px;text-align:center"></i> {{ $s->email }}
+                        </a>
+                        @endif
+                        @if($s->phone)
+                        <a href="tel:{{ preg_replace('/\s+/', '', $s->phone) }}" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;color:var(--color-text);text-decoration:none;font-size:0.85rem">
+                            <i aria-hidden="true" class="fas fa-phone" style="color:var(--color-primary);width:20px;text-align:center"></i> {{ $s->phone }}
+                        </a>
+                        @endif
+                    </div>
                     @endif
                 </div>
-                @endif
+                <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:1.5rem;box-shadow:0 0 20px rgba(34,139,34,0.25),var(--shadow-sm);border:1px solid rgba(34,139,34,0.3)">
+                    <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:0.75rem;color:var(--color-text-muted);display:flex;align-items:center;gap:0.5rem"><i aria-hidden="true" class="fas fa-shield-alt" style="color:var(--color-primary)"></i> {{ app()->getLocale() === 'ar' ? 'الشفافية والتوثيق' : 'Transparency & Trust' }}</h4>
+                    <p style="font-size:0.78rem;line-height:1.7;color:var(--color-text-muted);margin-bottom:1rem">تخضع منظمة ساهم الدولية للاغاثة والتنمية لقوانين الاتحاد الاوروبي وتمتثل بعملها وفق اعلى معايير الحوكمة والشفافية المالية والإدارية. ونلتزم بأمن المعلومات وبقواعد أمان صارمة ونزاهة مؤسسية تضمن إيصال المساعدات لمستحقيها بكل مسؤولية وموثوقية قانونية</p>
+                    <div class="contact-trust-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
+                            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-lock"></i></div>
+                            <strong style="font-size:0.8rem;line-height:1.3">SSL Secured</strong>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">مشفّر 256-bit</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
+                            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-credit-card"></i></div>
+                            <strong style="font-size:0.8rem;line-height:1.3">متوافق مع PCI</strong>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">أمان المدفوعات</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
+                            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-certificate"></i></div>
+                            <strong style="font-size:0.8rem;line-height:1.3">مرخصة رسمياً</strong>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">منظمة مسجلة</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
+                            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-hand-holding-heart"></i></div>
+                            <strong style="font-size:0.8rem;line-height:1.3">جهة خيرية رسمية</strong>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">معتمد وموثق</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
         </div>
+   
     </div>
 </section>
 
@@ -331,6 +395,7 @@
 <style>
 .contact__grid--rtl { flex-direction: row-reverse; }
 .contact__grid--ltr { flex-direction: row; }
+@media (max-width:640px) { .contact-trust-grid { grid-template-columns:1fr !important; } }
 .project-card__actions { display: flex; gap: 8px; margin-top: 12px; }
 .project-card__actions .btn--primary { order: 0; }
 .project-card__actions .btn--outline { order: 1; }
@@ -345,42 +410,46 @@
 
 .hero-slide { position: relative; display: flex; align-items: center; justify-content: center; min-height: 80vh; background: linear-gradient(135deg, #0d6b4f 0%, #083b2b 100%); background-image: var(--slide-bg); background-size: cover; background-position: center; }
 
-.hero-slide__overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.45); z-index: 1; }
+.hero-slide__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%); z-index: 1; }
 
-.hero-slide__content { position: relative; z-index: 2; text-align: center; color: #fff; max-width: 780px; padding: 20px; }
+.hero-slide__content { position: relative; z-index: 2; text-align: center; color: #fff; max-width: 820px; padding: 30px 40px; border-radius: 16px; }
 
-.hero-slide__title { font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; margin-bottom: 16px; line-height: 1.15; text-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+.hero-slide__title { font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 900; margin-bottom: 12px; line-height: 1.2; text-shadow: 0 4px 30px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3); letter-spacing: -0.02em; }
 
-.hero-slide__subtitle { font-size: clamp(1rem, 1.6vw, 1.25rem); opacity: 0.9; margin-bottom: 28px; line-height: 1.6; text-shadow: 0 1px 10px rgba(0,0,0,0.2); max-width: 600px; margin-inline: auto; }
+.hero-slide__title::after { content: ''; display: block; width: 60px; height: 4px; border-radius: 2px; margin: 16px auto 0; background: currentColor; opacity: .5; }
 
-.hero-slide__action { margin-top: 1rem; }
+.hero-slide__subtitle { font-size: clamp(1rem, 1.5vw, 1.2rem); opacity: 0.92; margin-bottom: 24px; line-height: 1.7; text-shadow: 0 2px 20px rgba(0,0,0,0.4); max-width: 580px; margin-inline: auto; }
+
+.hero-slide__action { margin-top: .5rem; }
 
 /* Button */
-.hero-slide__action .btn--primary { border-radius: 8px; padding: 14px 36px; font-size: 1.1rem; font-weight: 700; }
+.hero-slide__action .btn--primary { border-radius: 50px; padding: 14px 40px; font-size: 1.05rem; font-weight: 700; box-shadow: 0 4px 20px rgba(0,0,0,0.2); transition: transform .2s, box-shadow .2s; }
+.hero-slide__action .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,0,0,0.3); }
 
 /* Navigation Arrows */
 .hero-slider .swiper-button-next,
 .hero-slider .swiper-button-prev {
-    width: 44px; height: 44px; margin-top: -22px;
-    background: rgba(255,255,255,0.2); border-radius: 50%;
-    color: #fff; font-size: 18px;
-    transition: background 0.2s;
+    width: 48px; height: 48px; margin-top: -24px;
+    background: rgba(255,255,255,0.15); border-radius: 50%;
+    color: #fff; font-size: 18px; border: 2px solid rgba(255,255,255,0.25);
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    backdrop-filter: blur(4px);
 }
-.hero-slider .swiper-button-next { inset-inline-end: 20px; }
-.hero-slider .swiper-button-prev { inset-inline-start: 20px; }
 .hero-slider .swiper-button-next:hover,
-.hero-slider .swiper-button-prev:hover { background: rgba(255,255,255,0.35); }
-.hero-slider .swiper-button-next::after { content: '\276F'; font-family: inherit; font-size: 18px; }
-.hero-slider .swiper-button-prev::after { content: '\276E'; font-family: inherit; font-size: 18px; }
+.hero-slider .swiper-button-prev:hover { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); transform: scale(1.1); }
+.hero-slider .swiper-button-next { inset-inline-end: 24px; }
+.hero-slider .swiper-button-prev { inset-inline-start: 24px; }
+.hero-slider .swiper-button-next::after { content: '\276F'; font-family: inherit; font-size: 20px; }
+.hero-slider .swiper-button-prev::after { content: '\276E'; font-family: inherit; font-size: 20px; }
 
 /* Pagination Dots */
-.hero-slider .swiper-pagination { bottom: 24px !important; z-index: 3; }
+.hero-slider .swiper-pagination { bottom: 28px !important; z-index: 3; }
 .hero-slider .swiper-pagination-bullet {
-    width: 10px; height: 10px; background: rgba(255,255,255,0.5);
-    opacity: 1; border-radius: 50%; margin: 0 5px !important;
-    transition: background 0.2s; cursor: pointer;
+    width: 12px; height: 12px; background: rgba(255,255,255,0.4);
+    opacity: 1; border-radius: 50%; margin: 0 6px !important;
+    transition: all 0.3s; cursor: pointer; border: 2px solid rgba(255,255,255,0.5);
 }
-.hero-slider .swiper-pagination-bullet-active { background: #fff; }
+.hero-slider .swiper-pagination-bullet-active { background: #fff; transform: scale(1.2); border-color: #fff; }
 
 /* Slide animations */
 .hero-slide__title, .hero-slide__subtitle, .hero-slide__action {
@@ -397,18 +466,24 @@
 /* Responsive */
 @media (max-width: 768px) {
     .hero-slide { min-height: 60vh; }
-    .hero-slide__subtitle { margin-bottom: 20px; }
+    .hero-slide__content { padding: 20px; }
+    .hero-slide__title { font-size: clamp(1.5rem, 5vw, 2.2rem); }
+    .hero-slide__title::after { width: 40px; height: 3px; margin-top: 12px; }
+    .hero-slide__subtitle { margin-bottom: 20px; font-size: clamp(0.9rem, 2vw, 1rem); }
     .hero-slider .swiper-button-next,
-    .hero-slider .swiper-button-prev { width: 36px; height: 36px; margin-top: -18px; font-size: 14px; }
+    .hero-slider .swiper-button-prev { width: 36px; height: 36px; margin-top: -18px; font-size: 14px; border-width: 1.5px; }
     .hero-slider .swiper-button-next { inset-inline-end: 10px; }
     .hero-slider .swiper-button-prev { inset-inline-start: 10px; }
     .hero-slider .swiper-pagination { bottom: 14px !important; }
-    .hero-slider .swiper-pagination-bullet { width: 8px; height: 8px; }
+    .hero-slider .swiper-pagination-bullet { width: 8px; height: 8px; border-width: 1.5px; }
 }
 @media (max-width: 480px) {
     .hero-slide { min-height: 50vh; }
-    .hero-slide__title { margin-bottom: 10px; }
-    .hero-slide__action .btn--primary { padding: 12px 28px; font-size: 1rem; }
+    .hero-slide__content { padding: 16px; }
+    .hero-slide__title { margin-bottom: 8px; font-size: clamp(1.3rem, 6vw, 1.6rem); }
+    .hero-slide__title::after { width: 30px; height: 2px; margin-top: 10px; }
+    .hero-slide__subtitle { margin-bottom: 16px; }
+    .hero-slide__action .btn--primary { padding: 10px 24px; font-size: .9rem; }
 }
 
 .volunteer-cta__box { text-align: center; background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark)); border-radius: 16px; padding: 3rem 2rem; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
@@ -441,7 +516,7 @@
 .trust-badge--hero i { font-size:1.1rem; }
 .stats__title { font-size:1.3rem; font-weight:800; color:var(--color-heading); margin-bottom:1.5rem; position:relative; padding-bottom:10px; display:inline-block; }
 .stats__title::after { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:60px; height:3px; background:var(--color-primary); border-radius:2px; }
-.impact-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; max-width:900px; margin:0 auto; }
+.impact-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:20px; max-width:1100px; margin:0 auto; }
 .impact-card { background:#fff; padding:28px 16px; border-radius:12px; border:1px solid var(--color-border); box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:all 0.3s ease; }
 .impact-card:hover { transform:translateY(-6px); box-shadow:0 12px 32px rgba(0,0,0,0.1); }
 .impact-card .stat-item__number { display:block; font-size:2rem; font-weight:800; color:var(--color-heading); line-height:1.2; }
@@ -481,6 +556,8 @@
 /* Map Animations */
 @keyframes radarPulse { 0% { transform:scale(0.9); opacity:0.8; } 100% { transform:scale(2.4); opacity:0; } }
 .radar-pulse-ring { transform-origin:center; transform-box:fill-box; will-change:transform,opacity; animation:radarPulse 3s cubic-bezier(0.215,0.610,0.355,1) infinite; }
+@keyframes routeDash { to { stroke-dashoffset: -40; } }
+.route-line-animate { stroke-dasharray: 6 8; animation: routeDash 1.5s linear infinite; }
 
 /* Hero Map */
 .hero__map { display:flex; justify-content:center; align-items:center; width:100%; }

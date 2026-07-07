@@ -25,35 +25,7 @@
                     @if($s->youtube)<a href="{{ $s->youtube }}" target="_blank" rel="noopener" aria-label="YouTube"><i aria-hidden="true" class="fab fa-youtube"></i></a>@endif
                 </div>
             </div>
-            <div class="footer__col footer__col--trust">
-                <h4 class="footer__heading">الشفافية والتوثيق</h4>
-                <div class="footer__badges">
-                    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 12px;white-space:nowrap">
-                        <div style="width:26px;height:26px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0"><i aria-hidden="true" class="fas fa-credit-card"></i></div>
-                        <div style="display:flex;align-items:baseline;gap:6px">
-                            <strong style="font-size:0.78rem;color:#F8F9FA">شهادة PCI</strong>
-                            <span style="font-size:0.65rem;color:#A3AED0">أمان المدفوعات</span>
-                        </div>
-                        <span style="color:var(--color-primary);font-size:0.7rem"><i aria-hidden="true" class="fas fa-check-circle"></i></span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 12px;white-space:nowrap">
-                        <div style="width:26px;height:26px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0"><i aria-hidden="true" class="fas fa-hand-holding-heart"></i></div>
-                        <div style="display:flex;align-items:baseline;gap:6px">
-                            <strong style="font-size:0.78rem;color:#F8F9FA">مرخصة رسمياً</strong>
-                            <span style="font-size:0.65rem;color:#A3AED0">منظمة مسجلة</span>
-                        </div>
-                        <span style="color:var(--color-primary);font-size:0.7rem"><i aria-hidden="true" class="fas fa-check-circle"></i></span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 12px;white-space:nowrap">
-                        <div style="width:26px;height:26px;border-radius:50%;background:#d4a017;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0"><i aria-hidden="true" class="fas fa-certificate"></i></div>
-                        <div style="display:flex;align-items:baseline;gap:6px">
-                            <strong style="font-size:0.78rem;color:#F8F9FA">حاصل على شهادة أمنية</strong>
-                            <span style="font-size:0.65rem;color:#A3AED0">معتمد وموثق</span>
-                        </div>
-                        <span style="color:var(--color-primary);font-size:0.7rem"><i aria-hidden="true" class="fas fa-check-circle"></i></span>
-                    </div>
-                </div>
-            </div>
+
             <div class="footer__col footer__col--links">
                 <h4 class="footer__heading">روابط سريعة</h4>
                 <nav class="footer__nav">

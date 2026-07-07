@@ -17,11 +17,14 @@ class RolePermissionSeeder extends Seeder
             'slider', 'about', 'contact', 'partner', 'volunteer',
             'volunteer_opportunity', 'volunteer_task',
             'page', 'project', 'story',
-            'donation', 'payment_gateway',
+            'donation', 'payment_gateway', 'payment_confirmation',
             'statistic', 'program', 'payment_method',
-            'newsletter', 'gaza_stat',
+            'newsletter', 'gaza_stat', 'testimonial',
             'donation_submission', 'contact_submission', 'complaint',
             'user', 'role', 'permission',
+            'post', 'category', 'tag',
+            'campaign', 'cryptocurrency', 'crypto_network',
+            'emergency_campaign', 'faq', 'quick_action',
         ];
 
         $actions = ['view_any', 'view', 'create', 'update', 'delete'];
@@ -33,6 +36,7 @@ class RolePermissionSeeder extends Seeder
             }
         }
         $permissions[] = 'manage_settings';
+        $permissions[] = 'manage_chat';
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
@@ -64,6 +68,10 @@ class RolePermissionSeeder extends Seeder
                 'view_any_gaza_stat', 'view_gaza_stat', 'update_gaza_stat',
                 'view_any_newsletter', 'view_newsletter',
                 'view_any_complaint', 'view_complaint', 'update_complaint', 'delete_complaint',
+
+                'view_any_post', 'view_post', 'create_post', 'update_post', 'delete_post',
+                'view_any_category', 'view_category', 'create_category', 'update_category', 'delete_category',
+                'view_any_tag', 'view_tag', 'create_tag', 'update_tag', 'delete_tag',
             ])->get()
         );
 

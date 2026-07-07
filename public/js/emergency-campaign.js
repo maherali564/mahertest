@@ -217,6 +217,14 @@ class EmergencyCampaign {
                 const result = await response.json();
 
                 if (result.success) {
+                    if (result.checkout_url) {
+                        this.showToast('جاري تحويلك إلى بوابة الدفع الآمن...', 'success');
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
+                        window.location.href = result.checkout_url;
+                        return;
+                    }
+
                     form.reset();
                     document.querySelectorAll('.ec-amount-btn').forEach(b => b.classList.remove('selected'));
                     document.querySelectorAll('.ec-currency-btn').forEach(b => b.classList.remove('active'));

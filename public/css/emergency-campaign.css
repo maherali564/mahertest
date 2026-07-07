@@ -1052,3 +1052,9 @@
     .ec-donation-card { padding: 1.5rem; }
     .ec-gallery-grid { grid-template-columns: 1fr; }
 }
+
+html { overflow-x: hidden; width: 100%; }
+body { overflow-x: hidden; width: 100%; position: relative; }
+.ec-hero-bg { background-attachment: scroll; }
+.ec-main-grid, .ec-story-section, .ec-map-section { max-width: 100%; }
+.map-container { max-width: 100%; }

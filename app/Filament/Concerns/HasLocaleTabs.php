@@ -2,6 +2,7 @@
 
 namespace App\Filament\Concerns;
 
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
@@ -10,8 +11,8 @@ use Filament\Forms\Components\RichEditor;
 
 trait HasLocaleTabs
 {
-    /** Generate a Tabs component with per-locale inputs for a translatable field. */
-    protected static function localeTabs(string $field, string $label, string $type = 'text'): Tabs
+    /** Generate a Section + Tabs with per-locale inputs for a translatable field. */
+    protected static function localeTabs(string $field, string $label, string $type = 'text'): Section
     {
         $locales = [
             'ar' => ['label' => 'العربية', 'dir' => 'rtl'],
@@ -22,8 +23,7 @@ trait HasLocaleTabs
             'sv' => ['label' => 'Svenska', 'dir' => 'ltr'],
         ];
 
-        return Tabs::make($field.'_tabs')
-            ->label($label)
+        $tabs = Tabs::make($field.'_tabs')
             ->tabs(collect($locales)->map(function ($meta, $locale) use ($field, $type) {
                 $name = "{$field}.{$locale}";
 
@@ -35,5 +35,7 @@ trait HasLocaleTabs
 
                 return Tab::make($locale)->label($meta['label'])->schema([$input]);
             })->values()->all());
+
+        return Section::make($label)->schema([$tabs])->compact();
     }
 }

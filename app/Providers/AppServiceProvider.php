@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +39,35 @@ class AppServiceProvider extends ServiceProvider
             }
         } catch (\Throwable) {}
 
-        view()->composer('*', fn ($view) => $view->with('settings', $settings));
+        view()->composer('*', function ($view) use ($settings) {
+            $view->with('settings', $settings);
+            $locale = App::getLocale();
+            if (!$view->offsetExists('currentLocale')) {
+                $view->with('currentLocale', $locale);
+            }
+            if (!$view->offsetExists('isRtl')) {
+                $view->with('isRtl', $locale === 'ar');
+            }
+            if (!$view->offsetExists('cspNonce')) {
+                $request = request();
+                $nonce = $request ? $request->attributes->get('csp_nonce') : null;
+                $view->with('cspNonce', $nonce ?? base64_encode(random_bytes(18)));
+            }
+            if (!$view->offsetExists('supportedLocales')) {
+                $view->with('supportedLocales', config('app.supported_locales', ['ar', 'en']));
+            }
+            if (!$view->offsetExists('localeLabels')) {
+                $allLabels = [
+                    'ar' => 'العربية',
+                    'en' => 'English',
+                    'es' => 'Español',
+                    'id' => 'Bahasa Indonesia',
+                    'tr' => 'Türkçe',
+                    'sv' => 'Svenska',
+                ];
+                $supported = config('app.supported_locales', ['ar', 'en']);
+                $view->with('localeLabels', array_intersect_key($allLabels, array_flip($supported)));
+            }
+        });
     }
 }

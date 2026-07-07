@@ -28,6 +28,7 @@ class StoryResource extends Resource
         return $form->schema([
             static::localeTabs('title', __('filament.pages.manage_site_settings.about_title')),
             static::localeTabs('content', __('filament.pages.manage_site_settings.about_content'), 'richtext'),
+            static::localeTabs('excerpt', __('filament.resources.story.excerpt'), 'textarea'),
             static::localeTabs('person_name', __('filament.resources.story.column_person')),
             Forms\Components\TextInput::make('age')->label(__('filament.resources.story.age'))->numeric(),
             static::localeTabs('location', __('filament.resources.story.location')),
@@ -69,18 +70,6 @@ class StoryResource extends Resource
                         ->nullable()
                         ->deleteUploadedFileUsing(fn ($file) => Storage::disk('public')->delete($file))
                         ->removeUploadedFileButtonPosition('right'),
-                    Forms\Components\Group::make([
-                        Forms\Components\TextInput::make('video_url')
-                            ->label(__('filament.resources.story.video_url'))
-                            ->url()
-                            ->placeholder('https://youtube.com/watch?v=...')
-                            ->nullable(),
-                        Forms\Components\Select::make('video_type')->label(__('filament.resources.story.video_type'))->options([
-                            'youtube' => 'YouTube',
-                            'vimeo' => 'Vimeo',
-                            'upload' => __('filament.resources.story.video_type_upload'),
-                        ])->placeholder(__('filament.resources.story.video_type_auto'))->nullable(),
-                    ])->columns(2),
                 ])->collapsible(),
             Forms\Components\TextInput::make('sort_order')->label(__('filament.resources.gaza_stat.sort_order'))->numeric()->default(0),
             Forms\Components\Toggle::make('is_active')->label(__('filament.resources.user.column_active'))->default(true),

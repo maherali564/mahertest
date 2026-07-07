@@ -20,4 +20,5 @@ return [
     'our_programs_desc' => 'Kami bekerja pada beberapa program bantuan untuk meringankan penderitaan',
     'quick_links' => 'Tautan cepat',
     'follow_us' => 'Ikuti kami',
+    'blog_posts_desc' => 'Artikel dan laporan terbaru',
 ];

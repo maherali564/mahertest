@@ -20,4 +20,5 @@ return [
     'our_programs_desc' => 'We work on several relief programs to alleviate suffering',
     'quick_links' => 'Quick Links',
     'follow_us' => 'Follow Us',
+    'blog_posts_desc' => 'Latest articles and reports',
 ];

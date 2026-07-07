@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PaymentGatewaySeeder::class,
             ContentSeeder::class,
+            PostsSeeder::class,
         ]);
     }
 }

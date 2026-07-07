@@ -579,25 +579,25 @@
                 <!-- 2. Donor and Recipient Flow Lines (Animated) -->
                 
                 <!-- Belgium (Source) to North America -->
-                <path d="M 414,391 Q 274,346 180,410" fill="none" stroke="#d9a441" stroke-width="2" opacity="0.65" class="route-line-animate" />
+                <path d="M 414,391 Q 274,346 180,410" fill="none" stroke="#d9a441" stroke-width="1.5" opacity="0.7" class="route-line-animate" />
                 
                 <!-- Belgium (Source) to South America -->
-                <path d="M 414,391 Q 274,466 270,560" fill="none" stroke="#d9a441" stroke-width="2" opacity="0.65" class="route-line-animate" />
+                <path d="M 414,391 Q 274,466 270,560" fill="none" stroke="#d9a441" stroke-width="1.5" opacity="0.7" class="route-line-animate" />
 
                 <!-- Belgium (Source) to West Africa -->
-                <path d="M 414,391 Q 384,466 440,520" fill="none" stroke="#d9a441" stroke-width="2" opacity="0.65" class="route-line-animate" />
+                <path d="M 414,391 Q 384,466 440,520" fill="none" stroke="#d9a441" stroke-width="1.5" opacity="0.7" class="route-line-animate" />
 
                 <!-- Belgium (Source) to East Africa -->
-                <path d="M 414,391 Q 454,466 515,530" fill="none" stroke="#d9a441" stroke-width="2" opacity="0.65" class="route-line-animate" />
+                <path d="M 414,391 Q 454,466 515,530" fill="none" stroke="#d9a441" stroke-width="1.5" opacity="0.7" class="route-line-animate" />
 
                 <!-- Belgium (Source) to Middle East -->
-                <path d="M 414,391 Q 434,436 490,450" fill="none" stroke="#d9a441" stroke-width="2" opacity="0.65" class="route-line-animate" />
+                <path d="M 414,391 Q 434,436 490,450" fill="none" stroke="#d9a441" stroke-width="1.5" opacity="0.7" class="route-line-animate" />
 
                 <!-- Belgium (Source) to South Asia -->
-                <path d="M 414,391 Q 494,446 600,490" fill="none" stroke="#d9a441" stroke-width="2" opacity="0.65" class="route-line-animate" />
+                <path d="M 414,391 Q 494,446 600,490" fill="none" stroke="#d9a441" stroke-width="1.5" opacity="0.7" class="route-line-animate" />
 
                 <!-- Belgium (Source) to East Asia -->
-                <path d="M 414,391 Q 534,386 690,420" fill="none" stroke="#d9a441" stroke-width="2" opacity="0.65" class="route-line-animate" />
+                <path d="M 414,391 Q 534,386 690,420" fill="none" stroke="#d9a441" stroke-width="1.5" opacity="0.7" class="route-line-animate" />
 
                 <!-- 3. Belgium Active Hub (Source Point) -->
                 <g class="belgium-active-pulse">

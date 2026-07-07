@@ -12,19 +12,11 @@ use Filament\Tables\Table;
 
 class ComplaintResource extends Resource
 {
+    use \App\Filament\Concerns\HasPermissionBasedAuthorization;
+
     protected static ?string $model = Complaint::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canViewAny(): bool
-    {
-        return auth()->user()?->can('view_any_complaint') ?? false;
-    }
 
     public static function form(Form $form): Form
     {
@@ -74,7 +66,8 @@ class ComplaintResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make(),
+            Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

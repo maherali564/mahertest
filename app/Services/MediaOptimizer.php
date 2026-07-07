@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 
 class MediaOptimizer
@@ -94,18 +95,23 @@ class MediaOptimizer
         $tmp = $fullPath . '.tmp.mp4';
 
         $cmd = sprintf(
-            '"%s" -i "%s" -c:v libx264 -crf 28 -preset medium -c:a aac -b:a 96k -movflags +faststart -y "%s" 2>&1',
+            '"%s" -i "%s" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 96k -movflags +faststart -y "%s" 2>&1',
             $ffmpeg,
             $fullPath,
             $tmp
         );
 
-        exec($cmd, $output, $code);
+        $result = Process::timeout(300)->run($cmd);
 
-        if ($code === 0 && file_exists($tmp) && filesize($tmp) > 1024) {
+        if ($result->successful() && file_exists($tmp) && filesize($tmp) > 1024) {
             if (filesize($tmp) < filesize($fullPath)) {
-                rename($tmp, $fullPath);
-                return true;
+                $backup = $fullPath . '.bak';
+                rename($fullPath, $backup);
+                if (rename($tmp, $fullPath)) {
+                    @unlink($backup);
+                    return true;
+                }
+                rename($backup, $fullPath);
             }
             @unlink($tmp);
         }

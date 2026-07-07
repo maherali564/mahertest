@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @php
+    use Illuminate\Support\Facades\Storage;
     $mediaItems = $project->media;
     $imageItems = $mediaItems->where('type', 'image');
     $allImages = $imageItems->pluck('path')->toArray();
@@ -64,7 +65,7 @@
                 @endif
 
                 <h1 class="section-title">{{ trans_field($project, 'title') }}</h1>
-                <div class="donate-project__description">{!! trans_field($project, 'content') ?: nl2br(e(trans_field($project, 'description'))) !!}</div>
+                <div class="donate-project__description">{!! safe_html(trans_field($project, 'content') ?: nl2br(e(trans_field($project, 'description')))) !!}</div>
 
                 @if($project->goal_amount > 0)
                 <div class="donate-project__progress">
@@ -127,9 +128,9 @@
                         <div class="form-group">
                             <label>{{ __('donate.select_project') }}</label>
                             <select name="project_id" id="projectSelect">
-                                <option value="">{{ $project->title ?: __('donate.main_campaign') }}</option>
+                                <option value="">{{ __('donate.select_project') }}</option>
                                 @foreach($projects as $proj)
-                                <option value="{{ $proj->id }}" {{ $proj->id == $project->id ? 'selected' : '' }}>{{ trans_field($proj, 'title') }}</option>
+                                <option value="{{ $proj->id }}" data-slug="{{ $proj->slug }}" {{ $proj->id == $project->id ? 'selected' : '' }}>{{ trans_field($proj, 'title') }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -594,7 +595,7 @@ html, body { overflow-x: hidden; }
 
 @push('scripts')
 <script nonce="{{ $cspNonce }}">
-const lightboxImages = {!! json_encode(array_map(fn($img) => asset('storage/'.$img), $allImages)) !!};
+const lightboxImages = @json(array_map(fn($img) => asset('storage/'.$img), $allImages));
 let currentIndex = 0;
 
 function openLightbox(index) {
@@ -608,26 +609,6 @@ function openLightbox(index) {
 function closeLightbox(e) {
     if (e && e.target !== e.currentTarget) return;
     document.getElementById('lightbox').style.display = 'none';
-    document.body.style.overflow = '';
-}
-
-function openVideoLightbox(url, type) {
-    var container = document.getElementById('videoLightboxContainer');
-    if (type === 'youtube' || type === 'vimeo') {
-        container.innerHTML = '<iframe src="' + url + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-    } else {
-        container.innerHTML = '<video controls autoplay muted playsinline src="' + url + '"></video>';
-        var v = container.querySelector('video');
-        if (v) v.play()['catch'](function(){});
-    }
-    document.getElementById('videoLightbox').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-
-function closeVideoLightbox(e) {
-    if (e && e.target !== e.currentTarget) return;
-    document.getElementById('videoLightboxContainer').innerHTML = '';
-    document.getElementById('videoLightbox').style.display = 'none';
     document.body.style.overflow = '';
 }
 
@@ -658,7 +639,8 @@ function updateCounter() {
 
     document.getElementById('projectSelect').addEventListener('change', function() {
         if (this.value) {
-            window.location.href = '{{ url($currentLocale . "/donate/project") }}/' + this.value;
+            var slug = this.options[this.selectedIndex].dataset.slug;
+            window.location.href = '{{ route("donate.project", ["locale" => $currentLocale, "slug" => "SLUG_PLACEHOLDER"]) }}'.replace('SLUG_PLACEHOLDER', slug);
         }
     });
 

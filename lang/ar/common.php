@@ -7,6 +7,7 @@ return [
     'nav_projects' => 'المشاريع',
     'nav_programs' => 'البرامج',
     'nav_donate' => 'التبرعات',
+    'nav_blog' => 'المدونة',
     'nav_contact' => 'تواصل معنا',
     'nav_stories' => 'أصوات تنتظر الحياة',
     'nav_faq' => 'الأسئلة الشائعة',

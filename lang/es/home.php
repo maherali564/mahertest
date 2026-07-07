@@ -20,4 +20,5 @@ return [
     'our_programs_desc' => 'Trabajamos en varios programas de ayuda para aliviar el sufrimiento',
     'quick_links' => 'Enlaces rápidos',
     'follow_us' => 'Síganos',
+    'blog_posts_desc' => 'Últimos artículos e informes',
 ];

@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path(env('FILAMENT_PATH', 'admin'))
+            ->path(config('filament.path', 'admin'))
             ->login()
             ->brandName(__('filament.brand'))
             ->favicon(asset('favicon.ico'))
