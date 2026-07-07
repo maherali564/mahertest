@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'all_posts' => 'Alla inlägg',
+    'no_posts' => 'Inga inlägg än',
+    'minutes_read' => 'min läsning',
+    'back_to_posts' => 'Tillbaka till inlägg',
+    'related_posts' => 'Relaterade inlägg',
+    'share' => 'Dela',
+    'published_at' => 'Publicerad',
+    'by_author' => 'Av',
+    'no_category' => 'Okategoriserad',
+    'read_more' => 'Läs mer',
+    'latest_posts' => 'Senaste inläggen',
+    'search_placeholder' => 'Sök inlägg...',
+    'search_results_for' => 'Sökresultat för: :q',
+    'no_results' => 'Inga resultat hittades',
+    'rss_title' => 'Sahem - Blogg',
+    'rss_description' => 'Senaste blogginläggen från Sahem International Relief & Development',
+    'categories' => 'Kategorier',
+    'tags' => 'Taggar',
+    'all_categories' => 'Alla kategorier',
+    'all_tags' => 'Alla taggar',
+    'by_category' => 'Kategori',
+    'by_tag' => 'Tagg',
+    'x_posts' => '{0} 0 inlägg|[1,1] :count inlägg|[2,*] :count inlägg',
+];

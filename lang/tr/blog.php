@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'all_posts' => 'Tüm Yazılar',
+    'no_posts' => 'Henüz yazı yok',
+    'minutes_read' => 'dk okuma süresi',
+    'back_to_posts' => 'Yazılara dön',
+    'related_posts' => 'İlgili Yazılar',
+    'share' => 'Paylaş',
+    'published_at' => 'Yayın tarihi',
+    'by_author' => 'Yazar',
+    'no_category' => 'Kategorisiz',
+    'read_more' => 'Devamını Oku',
+    'latest_posts' => 'Son Yazılar',
+    'search_placeholder' => 'Yazılarda ara...',
+    'search_results_for' => ':q için arama sonuçları',
+    'no_results' => 'Sonuç bulunamadı',
+    'rss_title' => 'Sahem - Blog',
+    'rss_description' => 'Sahem International Relief & Development\'ten en son blog yazıları',
+    'categories' => 'Kategoriler',
+    'tags' => 'Etiketler',
+    'all_categories' => 'Tüm Kategoriler',
+    'all_tags' => 'Tüm Etiketler',
+    'by_category' => 'Kategori',
+    'by_tag' => 'Etiket',
+    'x_posts' => '{0} 0 yazı|[1,1] :count yazı|[2,*] :count yazı',
+];

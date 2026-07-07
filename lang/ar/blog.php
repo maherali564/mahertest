@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'all_posts' => 'جميع المقالات',
+    'no_posts' => 'لا توجد مقالات حالياً',
+    'minutes_read' => 'دقائق للقراءة',
+    'back_to_posts' => 'العودة إلى المقالات',
+    'related_posts' => 'مقالات ذات صلة',
+    'share' => 'مشاركة',
+    'published_at' => 'تاريخ النشر',
+    'by_author' => 'بواسطة',
+    'no_category' => 'غير مصنف',
+    'read_more' => 'اقرأ المزيد',
+    'latest_posts' => 'أحدث المقالات',
+    'search_placeholder' => 'ابحث في المقالات...',
+    'search_results_for' => 'نتائج البحث عن: :q',
+    'no_results' => 'لا توجد نتائج للبحث',
+    'rss_title' => 'ساهم - المدونة',
+    'rss_description' => 'أحدث المقالات من منصة ساهم الدولية للاغاثة والتنمية',
+    'categories' => 'التصنيفات',
+    'tags' => 'الوسوم',
+    'all_categories' => 'جميع التصنيفات',
+    'all_tags' => 'جميع الوسوم',
+    'by_category' => 'تصنيف',
+    'by_tag' => 'وسم',
+    'x_posts' => '{0} 0 مقال|[1,2] مقال واحد|[3,9] :count مقالات|[10,*] :count مقالاً',
+];

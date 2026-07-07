@@ -1,0 +1,16 @@
+/* Mobile sidebar visibility fix */
+@media (max-width: 1023px) {
+    .fi-sidebar-open {
+        background: white !important;
+        box-shadow: 8px 0 30px rgba(0,0,0,0.15) !important;
+        z-index: 60 !important;
+    }
+    .fi-sidebar-open + * {
+        /* No backdrop element exists, so ensure sidebar is prominent */
+    }
+    .fi-sidebar-item,
+    .fi-sidebar-group {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}

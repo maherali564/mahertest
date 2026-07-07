@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'all_posts' => 'All Posts',
+    'no_posts' => 'No posts yet',
+    'minutes_read' => 'min read',
+    'back_to_posts' => 'Back to posts',
+    'related_posts' => 'Related Posts',
+    'share' => 'Share',
+    'published_at' => 'Published at',
+    'by_author' => 'By',
+    'no_category' => 'Uncategorized',
+    'read_more' => 'Read More',
+    'latest_posts' => 'Latest Posts',
+    'search_placeholder' => 'Search posts...',
+    'search_results_for' => 'Search results for: :q',
+    'no_results' => 'No results found',
+    'rss_title' => 'Sahem - Blog',
+    'rss_description' => 'Latest blog posts from Sahem International Relief & Development',
+    'categories' => 'Categories',
+    'tags' => 'Tags',
+    'all_categories' => 'All Categories',
+    'all_tags' => 'All Tags',
+    'by_category' => 'Category',
+    'by_tag' => 'Tag',
+    'x_posts' => '{0} 0 posts|[1,1] :count post|[2,*] :count posts',
+];

@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'all_posts' => 'Semua Artikel',
+    'no_posts' => 'Belum ada artikel',
+    'minutes_read' => 'menit membaca',
+    'back_to_posts' => 'Kembali ke artikel',
+    'related_posts' => 'Artikel Terkait',
+    'share' => 'Bagikan',
+    'published_at' => 'Dipublikasikan pada',
+    'by_author' => 'Oleh',
+    'no_category' => 'Tanpa Kategori',
+    'read_more' => 'Baca Selengkapnya',
+    'latest_posts' => 'Artikel Terbaru',
+    'search_placeholder' => 'Cari artikel...',
+    'search_results_for' => 'Hasil pencarian untuk: :q',
+    'no_results' => 'Tidak ada hasil',
+    'rss_title' => 'Sahem - Blog',
+    'rss_description' => 'Artikel blog terbaru dari Sahem International Relief & Development',
+    'categories' => 'Kategori',
+    'tags' => 'Tag',
+    'all_categories' => 'Semua Kategori',
+    'all_tags' => 'Semua Tag',
+    'by_category' => 'Kategori',
+    'by_tag' => 'Tag',
+    'x_posts' => '{0} 0 artikel|[1,*] :count artikel',
+];
