@@ -60,6 +60,10 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 
 class AuthServiceProvider extends ServiceProvider
 {
+    /**
+     * Register all application policies.
+     * Each model is mapped to its corresponding policy for authorization.
+     */
     protected $policies = [
         Category::class => CategoryPolicy::class,
         Complaint::class => ComplaintPolicy::class,
@@ -92,6 +96,7 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Register all policies defined in $policies property
         $this->registerPolicies();
     }
 }

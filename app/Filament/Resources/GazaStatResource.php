@@ -27,7 +27,7 @@ class GazaStatResource extends Resource
             Forms\Components\TextInput::make('value')->label(__('filament.resources.gaza_stat.column_value'))->required(),
             Forms\Components\TextInput::make('prefix')->label(__('filament.resources.gaza_stat.prefix'))->placeholder('+'),
             Forms\Components\TextInput::make('icon')->label(__('filament.resources.gaza_stat.icon'))->default('❤️'),
-            Forms\Components\TextInput::make('sort_order')->label(__('filament.resources.gaza_stat.sort_order'))->numeric()->default(0),
+            Forms\Components\TextInput::make('sort_order')->label(__('filament.resources.gaza_stat.sort_order'))->numeric()->minValue(0)->default(0),
             Forms\Components\Toggle::make('is_active')->label(__('filament.resources.user.column_active'))->default(true),
         ]);
     }

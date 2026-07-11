@@ -75,20 +75,20 @@ class PaymentGatewayResource extends Resource
                 ->visible(fn (Forms\Get $get) => $get('driver') === 'stripe')
                 ->schema([
                     Forms\Components\TextInput::make('config.publishable_key')->label(__('filament.resources.payment_gateway.stripe_publishable'))
-                        ->placeholder('pk_live_...')->password()->revealable(),
+                        ->placeholder('pk_live_...')->password()->revealable()->dehydrated(fn ($state) => filled($state)),
                     Forms\Components\TextInput::make('config.secret_key')->label(__('filament.resources.payment_gateway.stripe_secret'))
-                        ->placeholder('sk_live_...')->password()->revealable(),
+                        ->placeholder('sk_live_...')->password()->revealable()->dehydrated(fn ($state) => filled($state)),
                     Forms\Components\TextInput::make('config.webhook_secret')->label(__('filament.resources.payment_gateway.stripe_webhook_secret'))
-                        ->placeholder('whsec_...')->password()->revealable(),
+                        ->placeholder('whsec_...')->password()->revealable()->dehydrated(fn ($state) => filled($state)),
                 ]),
 
             Forms\Components\Section::make(__('filament.resources.payment_gateway.section.paypal'))
                 ->visible(fn (Forms\Get $get) => $get('driver') === 'paypal')
                 ->schema([
                     Forms\Components\TextInput::make('config.client_id')->label(__('filament.resources.payment_gateway.paypal_client_id'))
-                        ->placeholder('AeF7x...')->password()->revealable(),
+                        ->placeholder('AeF7x...')->password()->revealable()->dehydrated(fn ($state) => filled($state)),
                     Forms\Components\TextInput::make('config.client_secret')->label(__('filament.resources.payment_gateway.paypal_client_secret'))
-                        ->placeholder('EHuP7...')->password()->revealable(),
+                        ->placeholder('EHuP7...')->password()->revealable()->dehydrated(fn ($state) => filled($state)),
                     Forms\Components\Select::make('config.mode')->label(__('filament.resources.payment_gateway.paypal_mode'))->options([
                         'sandbox' => __('filament.resources.payment_gateway.paypal_sandbox'),
                         'live' => __('filament.resources.payment_gateway.paypal_live'),

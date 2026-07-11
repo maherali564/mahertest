@@ -20,7 +20,16 @@ return [
         'api_token' => env('CLOUDFLARE_API_TOKEN'),
     ],
 
+    'translation' => [
+        'driver' => env('TRANSLATION_DRIVER', 'libretranslate'),
+    ],
+
     'libretranslate' => [
         'url' => env('LIBRETRANSLATE_URL', 'http://localhost:5000'),
+    ],
+
+    'google_translate' => [
+        'key' => env('GOOGLE_TRANSLATE_KEY'),
+        'project' => env('GOOGLE_TRANSLATE_PROJECT'),
     ],
 ];

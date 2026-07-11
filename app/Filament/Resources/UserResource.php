@@ -24,7 +24,16 @@ class UserResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('name')->label(__('filament.resources.donation_submission.column_name'))->required(),
             Forms\Components\TextInput::make('email')->label(__('filament.resources.newsletter.column_email'))->email()->required()->unique(ignoreRecord: true),
-            Forms\Components\TextInput::make('password')->label(__('filament.resources.user.password'))->password()->required(fn (string $operation): bool => $operation === 'create')->dehydrated(fn ($state): bool => filled($state)),
+            Forms\Components\TextInput::make('password')
+                ->label(__('filament.resources.user.password'))
+                ->password()
+                ->required(fn (string $operation): bool => $operation === 'create')
+                ->dehydrated(fn ($state): bool => filled($state))
+                ->rules(fn (string $operation): array => $operation === 'create' ? [
+                    'min:8',
+                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^_\-+])[A-Za-z\d@$!%*#?&^_\-+]{8,}$/',
+                ] : ['nullable', 'min:8']),
+                // Password strength: min 8 chars, uppercase, lowercase, number, special char
             Forms\Components\Select::make('roles')
                 ->label(__('filament.resources.user.column_role'))
                 ->relationship('roles', 'name')

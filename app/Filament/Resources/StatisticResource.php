@@ -27,7 +27,7 @@ class StatisticResource extends Resource
                 Statistic::TYPE_ACHIEVEMENT => __('filament.resources.statistic.type_achievement'),
                 Statistic::TYPE_HUMANITARIAN => __('filament.resources.statistic.type_humanitarian'),
             ])->required(),
-            Forms\Components\TextInput::make('value')->label(__('filament.resources.gaza_stat.column_value'))->numeric()->required(),
+            Forms\Components\TextInput::make('value')->label(__('filament.resources.gaza_stat.column_value'))->numeric()->minValue(0)->required(),
             Forms\Components\TextInput::make('prefix')->label(__('filament.resources.statistic.prefix'))->placeholder('+'),
             Forms\Components\TextInput::make('icon')->label(__('filament.resources.statistic.icon'))->placeholder('fa-hand-holding-heart')->helperText(__('filament.resources.statistic.icon_helper')),
             static::localeTabs('label', __('filament.resources.gaza_stat.column_label')),

@@ -5,11 +5,15 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('contact', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(5)->by($request->input('email').'|'.$request->ip()));
         RateLimiter::for('volunteer', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
+        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
 
         $settings = null;
         try {
@@ -37,7 +42,9 @@ class AppServiceProvider extends ServiceProvider
             if ($settings && $locales = $settings->supported_locales) {
                 config(['app.supported_locales' => $locales]);
             }
-        } catch (\Throwable) {}
+        } catch (\Throwable $e) {
+            Log::warning('Failed to load site settings', ['error' => $e->getMessage()]);
+        }
 
         view()->composer('*', function ($view) use ($settings) {
             $view->with('settings', $settings);
@@ -51,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
             if (!$view->offsetExists('cspNonce')) {
                 $request = request();
                 $nonce = $request ? $request->attributes->get('csp_nonce') : null;
-                $view->with('cspNonce', $nonce ?? base64_encode(random_bytes(18)));
+                $view->with('cspNonce', $nonce ?? Str::random(32));
             }
             if (!$view->offsetExists('supportedLocales')) {
                 $view->with('supportedLocales', config('app.supported_locales', ['ar', 'en']));
@@ -69,5 +76,10 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('localeLabels', array_intersect_key($allLabels, array_flip($supported)));
             }
         });
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_START,
+            fn () => '<style>.fi-section-header-heading { text-align: center; }</style>',
+        );
     }
 }

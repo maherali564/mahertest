@@ -30,11 +30,14 @@ class DonationController extends Controller
         return view('donate.project', compact('project', 'donations', 'paymentMethods', 'projects', 'stories'));
     }
 
-    /** Show the donation form for a specific story. */
-    public function storyPage(string $locale, string $id): View
+    /** Show the donation form for a specific story by slug (falls back to id before migration). */
+    public function storyPage(string $locale, string $slug): View
     {
-        $story = Story::findOrFail($id);
-        if (!$story->is_active) abort(404);
+        $story = Story::active()->where('slug', $slug)->first();
+        if (!$story && ctype_digit($slug)) {
+            $story = Story::active()->findOrFail($slug);
+        }
+        if (!$story) abort(404);
         $donations = Donation::completed()->where('story_id', $story->id)->latest()->limit(20)->get();
         $paymentMethods = PaymentMethod::with('gateway')->active()->get();
         $projects = Project::active()->get();
@@ -50,14 +53,14 @@ class DonationController extends Controller
             'donor_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
-            'amount' => 'required|numeric|min:1',
+            'amount' => 'required|numeric|min:1|max:999999.99',
             'payment_method_id' => 'required|exists:payment_methods,id',
             'is_anonymous' => 'nullable|boolean',
             'is_recurring' => 'nullable|boolean',
             'recurring_interval' => 'nullable|string|in:monthly,quarterly,yearly',
-            'project_id' => 'nullable|exists:projects,id',
+            'project_id' => 'nullable|exists:projects,id|exists:projects,id,is_active,1',
             'post_id' => 'nullable|exists:posts,id',
-            'story_id' => 'nullable|exists:stories,id',
+            'story_id' => 'nullable|exists:stories,id|exists:stories,id,is_active,1',
 
             'notes' => 'nullable|string|max:2000',
         ];

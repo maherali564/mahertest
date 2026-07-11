@@ -34,15 +34,15 @@
                     <ul class="nav__dropdown">
                         @foreach($navPrograms as $navProgram)
                         <li class="nav__dropdown-item">
-                            <a href="{{ route('projects.index', ['locale' => $currentLocale, 'program' => $navProgram->id]) }}" class="nav__dropdown-link">
+                            <span class="nav__dropdown-link" style="cursor:default">
                                 @if($navProgram->icon)<i class="{{ $navProgram->icon }}" style="margin-inline-end:6px;color:var(--color-primary)"></i>@endif
                                 {{ trans_field($navProgram, 'title') }}
-                            </a>
+                            </span>
                             @php $programProjects = $navProgram->projects->where('is_active', true)->sortBy('sort_order'); @endphp
                             @if($programProjects->isNotEmpty())
                             <ul class="nav__subdropdown">
                                 @foreach($programProjects as $pp)
-                                <li><a href="{{ route('projects.show', ['locale' => $currentLocale, 'slug' => $pp->slug]) }}" class="nav__subdropdown-link">{{ trans_field($pp, 'title') }}</a></li>
+                                <li><a href="{{ route('donate.project', ['locale' => $currentLocale, 'slug' => $pp->slug]) }}" class="nav__subdropdown-link">{{ trans_field($pp, 'title') }}</a></li>
                                 @endforeach
                             </ul>
                             @endif

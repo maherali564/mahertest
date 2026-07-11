@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\MediaOptimizer;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class OptimizeMedia extends Command
 {
@@ -12,6 +13,8 @@ class OptimizeMedia extends Command
 
     public function handle(): void
     {
+        set_time_limit(7200);
+
         $ffmpeg = config('services.ffmpeg.path', 'ffmpeg');
         $recentMinutes = (int) $this->option('recent');
         $cutoff = $recentMinutes > 0 ? now()->subMinutes($recentMinutes) : null;
@@ -32,26 +35,31 @@ class OptimizeMedia extends Command
 
             $ext = strtolower($f->getExtension());
 
-            if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
-                $before = $f->getSize();
-                $ok = MediaOptimizer::compressImage($rel);
-                if ($ok) {
-                    $after = filesize($f->getPathname());
-                    $saved = $before - $after;
-                    $pct = $before > 0 ? round(100 * $after / $before) : 0;
-                    $this->line("  <info>compressed</info> {$rel} ({$pct}%)");
-                    $count++;
+            try {
+                if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                    $before = $f->getSize();
+                    $ok = MediaOptimizer::compressImage($rel);
+                    if ($ok) {
+                        $after = filesize($f->getPathname());
+                        $pct = $before > 0 ? round(100 * $after / $before) : 0;
+                        $this->line("  <info>compressed</info> {$rel} ({$pct}%)");
+                        $count++;
+                    }
+                } elseif (in_array($ext, ['mp4', 'webm', 'mov', 'avi'])) {
+                    $before = $f->getSize();
+                    $ok = MediaOptimizer::compressVideo($rel);
+                    if ($ok) {
+                        $after = filesize($f->getPathname());
+                        $pct = $before > 0 ? round(100 * $after / $before) : 0;
+                        $this->line("  <info>compressed</info> {$rel} ({$pct}%)");
+                        $count++;
+                    }
                 }
-            } elseif (in_array($ext, ['mp4', 'webm', 'mov', 'avi'])) {
-                $before = $f->getSize();
-                $ok = MediaOptimizer::compressVideo($rel);
-                if ($ok) {
-                    $after = filesize($f->getPathname());
-                    $saved = $before - $after;
-                    $pct = $before > 0 ? round(100 * $after / $before) : 0;
-                    $this->line("  <info>compressed</info> {$rel} ({$pct}%)");
-                    $count++;
-                }
+            } catch (\Exception $e) {
+                Log::warning('Media optimization failed for file', [
+                    'file' => $rel,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

@@ -28,7 +28,7 @@
                     </div>
                     @endif
                     <div class="story-card__actions" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-                        <a href="{{ route('donate.story', ['locale' => $currentLocale, 'id' => $story->id]) }}" class="btn btn--primary btn--sm">{{ __('common.contribute') }}</a>
+                        <a href="{{ route('donate.story', ['locale' => $currentLocale, 'slug' => $story->slug ?? $story->id]) }}" class="btn btn--primary btn--sm">{{ __('common.contribute') }}</a>
                     </div>
                 </div>
             </article>

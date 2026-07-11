@@ -24,6 +24,11 @@ class EmergencyDonationReceived implements ShouldBroadcast
         return new Channel('emergency-campaign.' . $this->donation->emergency_campaign_id);
     }
 
+    public function broadcastQueue(): string
+    {
+        return 'broadcasts';
+    }
+
     public function broadcastWith(): array
     {
         $campaign = $this->donation->campaign;
@@ -33,16 +38,17 @@ class EmergencyDonationReceived implements ShouldBroadcast
                 'id' => $this->donation->id,
                 'donor_name' => $this->donation->donorDisplayName(),
                 'amount' => number_format($this->donation->amount, 2),
-                'currency' => $this->donation->currency,
-                'message' => $this->donation->message,
+                'currency' => strip_tags($this->donation->currency),
+                'message' => strip_tags($this->donation->message ?? ''),
                 'created_at' => $this->donation->created_at->diffForHumans(),
-                'country' => $this->donation->donor_country,
-                'city' => $this->donation->donor_city,
-                'latitude' => (float) $this->donation->donor_latitude,
-                'longitude' => (float) $this->donation->donor_longitude,
+                'country' => strip_tags($this->donation->donor_country ?? ''),
+                'city' => strip_tags($this->donation->donor_city ?? ''),
+                // Keeping them commented for future map features (aggregated, not per-donor)
+                // 'latitude' => (float) $this->donation->donor_latitude,
+                // 'longitude' => (float) $this->donation->donor_longitude,
             ],
             'new_total' => number_format($this->newTotal, 2),
-            'currency' => $this->donation->currency,
+            'currency' => strip_tags($this->donation->currency),
             'donor_count' => $this->donorCount,
             'progress_percent' => $campaign ? round($this->newTotal / max($campaign->target_amount, 1) * 100, 1) : 0,
         ];

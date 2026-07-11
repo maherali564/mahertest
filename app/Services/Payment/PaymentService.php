@@ -4,6 +4,7 @@ namespace App\Services\Payment;
 
 use App\Models\Donation;
 use App\Models\PaymentGateway;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class PaymentService
@@ -29,7 +30,8 @@ class PaymentService
         $gateway = $donation->paymentMethod?->gateway;
 
         if (!$gateway) {
-            throw new RuntimeException("لا توجد بوابة دفع مرتبطة بطريقة الدفع هذه");
+            Log::warning('Payment gateway not found for donation', ['donation_id' => $donation->id]);
+            throw new RuntimeException(__('payment.gateway_not_found'));
         }
 
         return new static($gateway);

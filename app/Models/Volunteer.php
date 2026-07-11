@@ -12,12 +12,25 @@ class Volunteer extends Model
     use Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'phone', 'national_id', 'date_of_birth', 'address',
+        'access_token', 'name', 'email', 'phone', 'national_id', 'date_of_birth', 'address',
         'emergency_contact_name', 'emergency_contact_phone', 'id_photo',
         'skills', 'availability', 'message', 'notes',
         'status', 'locale', 'approved_at', 'rejected_at', 'reviewed_by',
         'volunteer_opportunity_id',
     ];
+
+    protected $hidden = ['access_token'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $volunteer) {
+            if (empty($volunteer->access_token)) {
+                do {
+                    $volunteer->access_token = hash_hmac('sha256', random_bytes(32), config('app.key'));
+                } while (static::where('access_token', $volunteer->access_token)->exists());
+            }
+        });
+    }
 
     protected function casts(): array
     {

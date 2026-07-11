@@ -52,14 +52,18 @@ class ManageSiteSettings extends Page implements HasForms
                     static::localeTabs('tagline', __('filament.pages.manage_site_settings.tagline')),
                     static::localeTabs('hero_title', __('filament.pages.manage_site_settings.hero_title')),
                     static::localeTabs('hero_subtitle', __('filament.pages.manage_site_settings.hero_subtitle'), 'textarea'),
-                    FileUpload::make('hero_image')->label(__('filament.pages.manage_site_settings.hero_image'))->image()->directory('site')->visibility('public')->nullable()
+                    FileUpload::make('hero_image')->label(__('filament.pages.manage_site_settings.hero_image'))->image()->directory('site')->visibility('public')->nullable()->maxSize(2048)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                        ->rules(['mimes:jpeg,png,webp', 'max:2048'])
                         ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
                         ->afterStateHydrated(function (FileUpload $component, $state) {
                             if (is_string($state) && filled($state)) {
                                 $component->state([$state]);
                             }
                         })->removeUploadedFileButtonPosition('right'),
-                    FileUpload::make('logo')->label(__('filament.pages.manage_site_settings.logo'))->image()->directory('site')->visibility('public')->nullable()
+                    FileUpload::make('logo')->label(__('filament.pages.manage_site_settings.logo'))->image()->directory('site')->visibility('public')->nullable()->maxSize(2048)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                        ->rules(['mimes:jpeg,png,webp', 'max:2048'])
                         ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
                         ->afterStateHydrated(function (FileUpload $component, $state) {
                             if (is_string($state) && filled($state)) {

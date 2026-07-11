@@ -54,7 +54,7 @@ class StripeService
                 ],
                 'quantity' => 1,
             ]],
-            'success_url' => route('payment.success', ['locale' => $donation->locale, 'donation' => $donation->id], true),
+            'success_url' => route('payment.success', ['locale' => $donation->locale, 'donation' => $donation->id, 'token' => $donation->access_token], true),
             'cancel_url' => route('payment.cancel', ['locale' => $donation->locale, 'donation' => $donation->id, 'token' => $donation->access_token], true),
             'metadata' => ['donation_id' => $donation->id],
         ];
@@ -99,20 +99,24 @@ class StripeService
 
     /**
      * Verify a Stripe webhook signature using the configured webhook secret.
-     * @return array The parsed Stripe event, or empty array on failure.
+     * @return array|null The parsed Stripe event, or null on failure.
      */
-    public function verifyWebhook(string $payload, string $sigHeader): array
+    public function verifyWebhook(string $payload, string $sigHeader): ?array
     {
         $endpointSecret = $this->config['webhook_secret'] ?? '';
         if (empty($endpointSecret)) {
+            Log::error('Stripe webhook secret is not configured');
             throw new RuntimeException('Stripe webhook secret is not configured');
         }
 
         try {
             $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
             return $event->toArray();
-        } catch (\Exception) {
-            return [];
+        } catch (\Exception $e) {
+            Log::error('Stripe webhook verification failed', [
+                'error' => $e->getMessage(),
+            ]);
+            return null;
         }
     }
 }

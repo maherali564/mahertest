@@ -30,7 +30,7 @@ class CurrencyRateService
             Log::warning('Failed to fetch currency rates', ['error' => $e->getMessage()]);
         }
 
-        return [];
+        return Cache::get('currency_rates', []);
     }
 
     public function getRate(string $currency, ?float $default = null): float

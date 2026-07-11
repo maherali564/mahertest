@@ -76,7 +76,7 @@
 <section class="section" style="background:#f8fafc;padding-top:2rem;padding-bottom:3rem">
     <div class="container">
         <div class="section-header" style="text-align:center;margin-bottom:1.5rem">
-            <h2 class="section-title" style="font-size:1.5rem">{{ __('donor_wall.recent_donations') }}</h2>
+            <h2 class="section-title" style="font-size:1.5rem">{{ __('common.donor_wall.recent_donations') }}</h2>
         </div>
         <div class="donor-wall__compact">
             @foreach($projectDonations as $d)

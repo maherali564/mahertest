@@ -19,10 +19,12 @@ class ComplaintController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('attachment')) {
-            $data['attachment'] = $request->file('attachment')->store('complaints', 'public');
+            $data['attachment'] = $request->file('attachment')->store('complaints', 'local');
         }
 
-        $data['user_id'] = auth('donor')->id();
+        if (auth()->check()) {
+            $data['user_id'] = auth()->id();
+        }
 
         $complaint = Complaint::create($data);
 

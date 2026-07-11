@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,6 +14,18 @@ class MediaOptimizer
         if (!$disk->exists($path)) return false;
 
         $fullPath = $disk->path($path);
+        $realPath = realpath($fullPath);
+        $storagePath = realpath($disk->path(''));
+        if ($realPath === false || !str_starts_with($realPath, $storagePath)) {
+            Log::warning('MediaOptimizer: Invalid file path', ['path' => $path]);
+            return false;
+        }
+
+        if (!in_array(exif_imagetype($fullPath), [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
+            Log::warning('MediaOptimizer: Unsupported image type', ['path' => $path]);
+            return false;
+        }
+
         $info = pathinfo($fullPath);
         $ext = strtolower($info['extension']);
 
@@ -20,7 +33,12 @@ class MediaOptimizer
         $maxHeight = 1080;
 
         if ($ext === 'jpg' || $ext === 'jpeg') {
-            $img = @imagecreatefromjpeg($fullPath);
+            try {
+                $img = imagecreatefromjpeg($fullPath);
+            } catch (\Throwable $e) {
+                Log::warning('MediaOptimizer: Failed to load JPEG', ['path' => $path, 'error' => $e->getMessage()]);
+                return false;
+            }
             if (!$img) return false;
 
             $w = imagesx($img);
@@ -48,7 +66,12 @@ class MediaOptimizer
             return $ok;
 
         } elseif ($ext === 'png') {
-            $img = @imagecreatefrompng($fullPath);
+            try {
+                $img = imagecreatefrompng($fullPath);
+            } catch (\Throwable $e) {
+                Log::warning('MediaOptimizer: Failed to load PNG', ['path' => $path, 'error' => $e->getMessage()]);
+                return false;
+            }
             if (!$img) return false;
 
             imagesavealpha($img, true);
@@ -90,7 +113,14 @@ class MediaOptimizer
         if (!$disk->exists($path)) return false;
 
         $fullPath = $disk->path($path);
+        $realPath = realpath($fullPath);
+        $storagePath = realpath($disk->path(''));
+        if ($realPath === false || !str_starts_with($realPath, $storagePath)) {
+            return false;
+        }
         $ffmpeg = config('services.ffmpeg.path', 'ffmpeg');
+        $allowed = ['ffmpeg', '/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg'];
+        if ($ffmpeg !== 'ffmpeg' && !in_array($ffmpeg, $allowed, true)) return false;
 
         $tmp = $fullPath . '.tmp.mp4';
 

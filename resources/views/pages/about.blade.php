@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@php $isAr = app()->getLocale() === 'ar'; @endphp
 @section('content')
 <section class="section page-header">
     <div class="container">
@@ -11,13 +12,13 @@
 {{-- Our Story --}}
 <section class="section">
     <div class="container">
-        <div class="about-grid">
+        <div class="about-grid" style="align-items:start">
             <div>
                 <span class="section-tag" style="margin-bottom:8px;display:inline-block">{{ __('site.our_story') }}</span>
-                <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:16px;line-height:1.3">{{ __('site.story_title') }}</h2>
+                <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:16px;line-height:1.3">{{ $isAr ? 'منذ البداية، كانت رؤيتنا واضحة' : 'Our vision was clear from the start' }}</h2>
                 <div style="color:var(--color-text-muted);line-height:1.8;font-size:1rem">
-                    <p style="margin-bottom:12px">مبادرة «ساهم» للإغاثة والتنمية؛ هي مبادرة إنسانية غير حكومية، انطلقت برؤية شبابية تطوعية استجابةً للأزمات الإنسانية المتلاحقة.</p>
-                    <p style="margin-bottom:12px">واليوم، غدت "ساهم" منظمة دولية رسمية تسعى إلى تقديم الإغاثة والدعم العاجل والمستدام للمجتمعات المتضررة، مؤمنين بأن التغيير يبدأ بـالمساهمة، متسلحين بخبرة ميدانية عميقة وفهم دقيق لاحتياجات الفئات الأكثر تضرراً والمنكوبين.</p>
+                    <p style="margin-bottom:12px">{{ $isAr ? 'بدأت «ساهم» للإغاثة والتنمية؛ كمبادرة إنسانية غير حكومية، برؤية شبابية تطوعية استجابةً للأزمات الإنسانية المتلاحقة، قبل أن تتطور إلى منظمة غير حكومية بهيكلها التنظيمي الحالي' : 'Sahem for Relief and Development began as a non-governmental humanitarian initiative with a volunteer youth vision, responding to successive humanitarian crises, before evolving into a formally structured non-governmental organization.' }}</p>
+                    <p style="margin-bottom:12px">{{ $isAr ? 'واليوم، غدت "ساهم" منظمة دولية رسمية تسعى إلى تقديم الإغاثة والدعم العاجل والمستدام للمجتمعات المتضررة، مؤمنين بأن التغيير يبدأ بالمساهمة، متسلحين بخبرة ميدانية عميقة وفهم دقيق لاحتياجات الفئات الأكثر تضرراً والمنكوبين.' : 'Today, Sahem has become an official international organization working to provide urgent and sustainable relief and support to affected communities, believing that change begins with contribution, armed with deep field experience and a precise understanding of the needs of the most vulnerable and afflicted.' }}</p>
                 </div>
             </div>
             <div style="height:clamp(400px,50vw,600px);background:linear-gradient(135deg,var(--color-primary),var(--color-primary-dark));border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:#fff;font-size:4rem;overflow:hidden">
@@ -37,13 +38,13 @@
         <div class="about-grid-2">
             <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);text-align:center">
                 <div style="width:64px;height:64px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 16px"><i aria-hidden="true" class="fas fa-bullseye"></i></div>
-                <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:8px">رسالتنا</h3>
-                <p style="color:var(--color-text-muted);line-height:1.7">تخفيف المعاناة الإنسانية عبر تقديم مساعدات إغاثية فورية، وتطوير برامج تنموية مستدامة تمكّن الأفراد والمجتمعات من النهوض مجدداً.</p>
+                <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:8px">{{ $isAr ? 'رسالتنا' : 'Our Mission' }}</h3>
+                <p style="color:var(--color-text-muted);line-height:1.7">{{ $isAr ? 'تخفيف المعاناة الإنسانية عبر تقديم مساعدات إغاثية فورية، وتطوير برامج تنموية مستدامة تمكّن الأفراد والمجتمعات من النهوض مجدداً.' : 'To alleviate human suffering by providing immediate relief aid and developing sustainable programs that empower individuals and communities to rebuild their lives.' }}</p>
             </div>
             <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:32px;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);text-align:center">
                 <div style="width:64px;height:64px;border-radius:50%;background:var(--color-accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 16px"><i aria-hidden="true" class="fas fa-eye"></i></div>
-                <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:8px">رؤيتنا</h3>
-                <p style="color:var(--color-text-muted);line-height:1.7">ريادة العمل الإنساني والتنموي لبناء مجتمعات صامدة ومكتفية ذاتياً.</p>
+                <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:8px">{{ $isAr ? 'رؤيتنا' : 'Our Vision' }}</h3>
+                <p style="color:var(--color-text-muted);line-height:1.7">{{ $isAr ? 'ريادة العمل الإنساني والتنموي لبناء مجتمعات صامدة ومكتفية ذاتياً.' : 'To lead humanitarian and development work in building resilient, self-sufficient communities.' }}</p>
             </div>
         </div>
     </div>
@@ -61,59 +62,34 @@
                 <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.3rem;color:var(--color-primary)">
                     <i aria-hidden="true" class="fas fa-eye"></i>
                 </div>
-                <h4 style="font-weight:700;margin-bottom:6px">الشفافية</h4>
-                <p style="font-size:0.85rem;color:var(--color-text-muted)">نلتزم بالوضوح الكامل في إدارة الموارد والإبلاغ عن الأثر.</p>
+                <h4 style="font-weight:700;margin-bottom:6px">{{ $isAr ? 'الشفافية' : 'Transparency' }}</h4>
+                <p style="font-size:0.85rem;color:var(--color-text-muted)">{{ $isAr ? 'نلتزم بالوضوح الكامل في إدارة الموارد والإبلاغ عن الأثر.' : 'We are committed to full clarity in resource management and impact reporting.' }}</p>
             </div>
             <div style="text-align:center;padding:28px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--color-border)">
                 <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.3rem;color:var(--color-primary)">
                     <i aria-hidden="true" class="fas fa-bolt"></i>
                 </div>
-                <h4 style="font-weight:700;margin-bottom:6px">الاستجابة السريعة</h4>
-                <p style="font-size:0.85rem;color:var(--color-text-muted)">نصل إلى المتضررين في أسرع وقت ممكن لإنقاذ الأرواح وتخفيف المعاناة.</p>
+                <h4 style="font-weight:700;margin-bottom:6px">{{ $isAr ? 'الاستجابة السريعة' : 'Rapid Response' }}</h4>
+                <p style="font-size:0.85rem;color:var(--color-text-muted)">{{ $isAr ? 'نصل إلى المتضررين في أسرع وقت ممكن لإنقاذ الأرواح وتخفيف المعاناة.' : 'We reach those affected as quickly as possible to save lives and alleviate suffering.' }}</p>
             </div>
             <div style="text-align:center;padding:28px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--color-border)">
                 <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.3rem;color:var(--color-primary)">
                     <i aria-hidden="true" class="fas fa-shield-alt"></i>
                 </div>
-                <h4 style="font-weight:700;margin-bottom:6px">الأمانة</h4>
-                <p style="font-size:0.85rem;color:var(--color-text-muted)">نحافظ على أمانة التبرع ونضمن وصولها لمستحقيها بكل دقة ومسؤولية.</p>
+                <h4 style="font-weight:700;margin-bottom:6px">{{ $isAr ? 'الأمانة' : 'Stewardship' }}</h4>
+                <p style="font-size:0.85rem;color:var(--color-text-muted)">{{ $isAr ? 'نحافظ على أمانة التبرع ونضمن وصولها لمستحقيها بكل دقة ومسؤولية.' : 'We uphold the trust of every donation, ensuring it reaches those entitled to it with accuracy and responsibility.' }}</p>
             </div>
             <div style="text-align:center;padding:28px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--color-border)">
                 <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.3rem;color:var(--color-primary)">
                     <i aria-hidden="true" class="fas fa-hands-helping"></i>
                 </div>
-                <h4 style="font-weight:700;margin-bottom:6px">التمكين</h4>
-                <p style="font-size:0.85rem;color:var(--color-text-muted)">نعمل على تمكين الأفراد والمجتمعات لتحقيق اكتفاء ذاتي مستدام.</p>
+                <h4 style="font-weight:700;margin-bottom:6px">{{ $isAr ? 'التمكين' : 'Empowerment' }}</h4>
+                <p style="font-size:0.85rem;color:var(--color-text-muted)">{{ $isAr ? 'نعمل على تمكين الأفراد والمجتمعات لتحقيق اكتفاء ذاتي مستدام.' : 'We work to empower individuals and communities to achieve sustainable self-sufficiency.' }}</p>
             </div>
         </div>
     </div>
 </section>
 
-{{-- Impact Stats --}}
-<section style="background:var(--color-bg-dark);padding:60px 0">
-    <div class="container">
-        <div class="stats__grid">
-            <div class="stat-item stat-item--dark">
-                <span class="stat-item__number" data-amount="{{ $totalRaised }}">${{ number_format($totalRaised, 0) }}</span>
-                <span class="stat-item__label">{{ __('common.total_raised') }}</span>
-            </div>
-            <div class="stat-item stat-item--dark">
-                <span class="stat-item__number">{{ $totalDonations }}</span>
-                <span class="stat-item__label">{{ __('common.total_donations') }}</span>
-            </div>
-            <div class="stat-item stat-item--dark">
-                <span class="stat-item__number">{{ $totalDonors }}</span>
-                <span class="stat-item__label">{{ __('common.total_donors') }}</span>
-            </div>
-            @foreach($achievementStats as $stat)
-            <div class="stat-item stat-item--dark">
-                <span class="stat-item__number">{{ number_format($stat->value) }}</span>
-                <span class="stat-item__label">{{ trans_field($stat, 'label') }}</span>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
 
 {{-- Partners --}}
 @if($partners->isNotEmpty())
@@ -139,12 +115,5 @@
 </section>
 @endif
 
-{{-- CTA --}}
-<section style="background:var(--color-primary);padding:60px 0;text-align:center;color:#fff">
-    <div class="container">
-        <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:12px">{{ __('site.cta_title') }}</h2>
-        <p style="opacity:0.9;font-size:1.05rem;margin-bottom:24px;max-width:600px;margin-inline:auto">{{ __('site.cta_desc') }}</p>
-        <a href="{{ route('donate.page', ['locale' => $currentLocale]) }}" class="btn" style="background:#fff;color:var(--color-primary);font-weight:700;padding:14px 36px">{{ __('common.donate_now') }}</a>
-    </div>
-</section>
+
 @endsection

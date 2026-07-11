@@ -41,6 +41,7 @@ class PostResource extends Resource
                         ->searchable()
                         ->preload()
                         ->default(auth()->id())
+                        ->disabled(fn () => !auth()->user()?->hasRole('super_admin'))
                         ->columnSpan(1),
                 ]),
             static::localeTabs('title', __('filament.resources.post.title')),

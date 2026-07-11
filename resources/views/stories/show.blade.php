@@ -97,8 +97,8 @@
 
         <div class="story__meta" style="color:var(--color-text-muted);margin-bottom:1rem">
             @if($story->person_name)<span><strong>{{ __('common.full_name') }}:</strong> {{ trans_field($story, 'person_name') }}</span>@endif
-            @if($story->age)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>العمر:</strong> {{ $story->age }}</span>@endif
-            @if($story->location)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>الموقع:</strong> {{ trans_field($story, 'location') }}</span>@endif
+            @if($story->age)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>{{ app()->getLocale() === 'ar' ? 'العمر' : 'Age' }}:</strong> {{ $story->age }}</span>@endif
+            @if($story->location)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>{{ app()->getLocale() === 'ar' ? 'الموقع' : 'Location' }}:</strong> {{ trans_field($story, 'location') }}</span>@endif
         </div>
         <div>{!! safe_html(trans_field($story, 'content')) !!}</div>
 
@@ -115,7 +115,7 @@
         </div>
         @endif
 
-        <a href="{{ route('donate.story', ['locale' => $currentLocale, 'id' => $story->id]) }}" class="btn btn--primary" style="margin-top:2rem">{{ __('common.contribute') }}</a>
+        <a href="{{ route('donate.story', ['locale' => $currentLocale, 'slug' => $story->slug ?? $story->id]) }}" class="btn btn--primary" style="margin-top:2rem">{{ __('common.contribute') }}</a>
     </div>
 </section>
 
@@ -124,7 +124,7 @@
 <section class="section" style="background:#f8fafc;padding-top:2rem;padding-bottom:3rem">
     <div class="container">
         <div class="section-header" style="text-align:center;margin-bottom:1.5rem">
-            <h2 class="section-title" style="font-size:1.5rem">{{ __('donor_wall.recent_donations') }}</h2>
+            <h2 class="section-title" style="font-size:1.5rem">{{ __('common.donor_wall.recent_donations') }}</h2>
         </div>
         <div class="donor-wall__compact">
             @foreach($storyDonations as $d)

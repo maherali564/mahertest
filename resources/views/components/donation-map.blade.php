@@ -1,7 +1,8 @@
+@php $isAr = app()->getLocale() === 'ar'; @endphp
 <div class="donation-map-section">
     <div class="map-header">
-        <h2><i aria-hidden="true" class="fas fa-globe-americas"></i> تبرعات من حول العالم</h2>
-        <p>كل نقطة تمثل متبرعاً. الخطوط تظهر رحلة التبرع من دولته إلى {{ $campaign->target_country }}</p>
+        <h2><i aria-hidden="true" class="fas fa-globe-americas"></i> {{ $isAr ? 'تبرعات من حول العالم' : 'Donations from Around the World' }}</h2>
+        <p>{{ $isAr ? 'كل نقطة تمثل متبرعاً. الخطوط تظهر رحلة التبرع من دولته إلى' : 'Each dot represents a donor. Lines show the donation journey from their country to' }} {{ $campaign->target_country }}</p>
     </div>
 
     <div id="map-data"
@@ -17,24 +18,24 @@
 
     <div class="map-legend">
         <div class="legend-item">
-            <span class="legend-dot target"></span> {{ $campaign->target_country }} (الهدف)
+            <span class="legend-dot target"></span> {{ $campaign->target_country }} {{ $isAr ? '(الهدف)' : '(Target)' }}
         </div>
         <div class="legend-item">
-            <span class="legend-dot donor"></span> متبرع
+            <span class="legend-dot donor"></span> {{ $isAr ? 'متبرع' : 'Donor' }}
         </div>
         <div class="legend-item">
-            <span class="legend-line"></span> مسار التبرع
+            <span class="legend-line"></span> {{ $isAr ? 'مسار التبرع' : 'Donation Route' }}
         </div>
     </div>
 
     <div class="map-stats">
         <div class="map-stat">
             <span class="map-stat-value" id="map-country-count">0</span>
-            <span class="map-stat-label">دولة</span>
+            <span class="map-stat-label">{{ $isAr ? 'دولة' : 'Countries' }}</span>
         </div>
         <div class="map-stat">
             <span class="map-stat-value" id="map-total-donors">0</span>
-            <span class="map-stat-label">متبرع</span>
+            <span class="map-stat-label">{{ $isAr ? 'متبرع' : 'Donors' }}</span>
         </div>
     </div>
 </div>

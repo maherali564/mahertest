@@ -38,6 +38,7 @@ class CloudflareAnalyticsService
                 'endpoint' => $endpoint,
                 'error' => $e->getMessage(),
             ]);
+            Cache::forget('cloudflare_analytics_summary');
         }
 
         return [];

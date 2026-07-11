@@ -29,7 +29,7 @@ Route::prefix('{locale}')->where(['locale' => implode('|', config('app.supported
         Route::get('/about', [App\Http\Controllers\AboutController::class, 'index'])->name('about.index');
         Route::get('/transparency', [App\Http\Controllers\TransparencyController::class, 'index'])->name('transparency.index');
         Route::get('/stories', [StoryController::class, 'index'])->name('stories.index');
-        Route::get('/stories/{id}', [StoryController::class, 'show'])->name('stories.show');
+        Route::get('/stories/{slug}', [StoryController::class, 'show'])->name('stories.show');
 
         // Blog
         Route::get('/blog', [App\Http\Controllers\Blog\PostController::class, 'index'])->name('posts.index');
@@ -40,7 +40,7 @@ Route::prefix('{locale}')->where(['locale' => implode('|', config('app.supported
         Route::get('/tag/{slug}', [App\Http\Controllers\Blog\TagController::class, 'show'])->name('posts.tag');
 
         Route::get('/donate/project/{slug}', [DonationController::class, 'projectPage'])->name('donate.project');
-        Route::get('/donate/story/{id}', [DonationController::class, 'storyPage'])->name('donate.story');
+        Route::get('/donate/story/{slug}', [DonationController::class, 'storyPage'])->name('donate.story');
         Route::get('/donate', [App\Http\Controllers\DonateController::class, 'index'])->name('donate.page');
         Route::post('/donate', [DonationController::class, 'store'])->name('donate.store')->middleware('throttle:donations');
 
@@ -48,8 +48,8 @@ Route::prefix('{locale}')->where(['locale' => implode('|', config('app.supported
         Route::get('/emergency-campaigns', [EmergencyCampaignController::class, 'index'])->name('emergency-campaigns.index');
         Route::get('/emergency-campaigns/{campaign:slug}', [EmergencyCampaignController::class, 'show'])->name('emergency-campaigns.show');
         Route::post('/emergency-campaigns/{campaign:slug}/donate', [EmergencyCampaignController::class, 'donate'])->name('emergency-campaigns.donate')->middleware('throttle:5,1');
-        Route::get('/api/emergency-campaigns/{campaign:slug}/donations', [EmergencyCampaignController::class, 'donations'])->name('emergency-campaigns.donations');
-        Route::get('/api/emergency-campaigns/{campaign:slug}/stats', [EmergencyCampaignController::class, 'stats'])->name('emergency-campaigns.stats');
+        Route::get('/api/emergency-campaigns/{campaign:slug}/donations', [EmergencyCampaignController::class, 'donations'])->name('emergency-campaigns.donations')->middleware('throttle:30,1');
+        Route::get('/api/emergency-campaigns/{campaign:slug}/stats', [EmergencyCampaignController::class, 'stats'])->name('emergency-campaigns.stats')->middleware('throttle:30,1');
 
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:contact');
         Route::get('/complaints/create', [App\Http\Controllers\ComplaintController::class, 'create'])->name('complaints.create');
@@ -63,7 +63,7 @@ Route::prefix('{locale}')->where(['locale' => implode('|', config('app.supported
         Route::post('/payment/cancel/{donation}', [PaymentController::class, 'cancel'])->name('payment.cancel.post');
         Route::get('/payment/instructions/{donation}', [PaymentController::class, 'instructions'])->name('payment.instructions');
 
-                Route::get('/currency/rates', [App\Http\Controllers\CurrencyController::class, 'rates'])->name('currency.rates');
+                Route::get('/currency/rates', [App\Http\Controllers\CurrencyController::class, 'rates'])->name('currency.rates')->middleware('throttle:60,1');
 
                 Route::get('/rss.xml', [App\Http\Controllers\RssController::class, 'showLocale'])->name('rss.locale');
 
@@ -73,11 +73,11 @@ Route::post('/payment/webhook/stripe', [WebhookController::class, 'stripe'])->na
 Route::post('/payment/webhook/paypal', [WebhookController::class, 'paypal'])->name('payment.webhook.paypal')->middleware('throttle:60,1');
 
 // Admin locale switcher
-Route::get('/admin/locale/{locale}', function ($locale) {
+Route::match(['GET', 'POST'], '/admin/locale/{locale}', function ($locale) {
     $supported = config('app.supported_locales', ['ar', 'en', 'es', 'id', 'tr', 'sv']);
     if (in_array($locale, $supported)) {
         session(['locale' => $locale]);
         app()->setLocale($locale);
     }
     return redirect()->back();
-})->name('admin.locale')->middleware('auth');
+})->name('admin.locale')->middleware(['auth', 'throttle:10,1']);

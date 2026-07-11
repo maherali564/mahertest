@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Log;
 
 class TranslationService
 {
-    protected string $url;
+    protected string $driver;
+    protected string $libreUrl;
 
     public function __construct()
     {
-        $this->url = rtrim(config('services.libretranslate.url', 'http://localhost:5000'), '/');
+        $this->driver = config('services.translation.driver', 'libretranslate');
+        $this->libreUrl = rtrim(config('services.libretranslate.url', 'http://localhost:5000'), '/');
     }
 
     public function translate(string $text, string $source, string $target): string
@@ -20,8 +22,19 @@ class TranslationService
             return $text;
         }
 
+        if (strlen($text) > 5000) {
+            throw new \RuntimeException('Text too long for translation (max 5000 characters)');
+        }
+
+        return $this->driver === 'google'
+            ? $this->translateGoogle($text, $source, $target)
+            : $this->translateLibre($text, $source, $target);
+    }
+
+    protected function translateLibre(string $text, string $source, string $target): string
+    {
         $response = Http::timeout(30)
-            ->post("{$this->url}/translate", [
+            ->post("{$this->libreUrl}/translate", [
                 'q' => $text,
                 'source' => $source,
                 'target' => $target,
@@ -41,9 +54,47 @@ class TranslationService
             );
         }
 
-        $result = $response->json();
+        return $response->json('translatedText') ?? $text;
+    }
 
-        return $result['translatedText'] ?? $text;
+    protected function translateGoogle(string $text, string $source, string $target): string
+    {
+        $key = config('services.google_translate.key');
+        $project = config('services.google_translate.project');
+
+        if (empty($key) || empty($project)) {
+            Log::warning('Google Translate not configured, falling back to LibreTranslate');
+            return $this->translateLibre($text, $source, $target);
+        }
+
+        $map = [
+            'ar' => 'ar', 'en' => 'en', 'es' => 'es',
+            'id' => 'id', 'tr' => 'tr', 'sv' => 'sv',
+        ];
+        $sourceLang = $map[$source] ?? $source;
+        $targetLang = $map[$target] ?? $target;
+
+        $response = Http::timeout(15)
+            ->withHeaders(['Authorization' => "Bearer {$key}"])
+            ->post("https://translation.googleapis.com/v3/projects/{$project}:translateText", [
+                'sourceLanguageCode' => $sourceLang,
+                'targetLanguageCode' => $targetLang,
+                'contents' => [$text],
+                'mimeType' => 'text/plain',
+            ]);
+
+        if (!$response->successful()) {
+            Log::error('Google Translate API error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            Log::info('Falling back to LibreTranslate');
+            return $this->translateLibre($text, $source, $target);
+        }
+
+        $translations = $response->json('translations');
+
+        return $translations[0]['translatedText'] ?? $text;
     }
 
     public function translateModel($model, array $fields, ?array $targetLangs = null): void

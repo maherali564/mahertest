@@ -39,6 +39,7 @@ class EmergencyDonationService
             'currency' => $data['currency'] ?? 'USD',
             'payment_method' => 'stripe',
             'payment_status' => 'pending',
+            'is_anonymous' => $data['is_anonymous'] ?? false,
             'message' => isset($data['message']) ? strip_tags($data['message']) : null,
             'ip_address' => $ip,
             'user_agent' => request()->userAgent(),

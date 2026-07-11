@@ -38,7 +38,9 @@ class VolunteerController extends Controller
             'status' => 'pending',
         ]);
 
-        session()->flash('volunteer_id', $volunteer->id);
+        // Store both ID and access_token for session-bound verification
+        session()->put('volunteer_id', $volunteer->id);
+        session()->put('volunteer_token', $volunteer->access_token);
 
         return back()->with('success', __('common.volunteer_success'));
     }
@@ -47,16 +49,13 @@ class VolunteerController extends Controller
     public function dashboard(Request $request): View
     {
         $volunteerId = session('volunteer_id');
+        $sessionToken = session('volunteer_token');
         $volunteer = null;
 
-        if ($volunteerId) {
-            $volunteer = Volunteer::with('tasks')->find($volunteerId);
-        }
-
-        if (!$volunteer && $request->has('ref') && $request->filled('email')) {
-            $volunteer = Volunteer::where('id', $request->query('ref'))
-                ->where('email', $request->input('email'))
-                ->with('tasks')
+        if ($volunteerId && $sessionToken) {
+            $volunteer = Volunteer::with('tasks')
+                ->where('id', $volunteerId)
+                ->where('access_token', $sessionToken)
                 ->first();
         }
 

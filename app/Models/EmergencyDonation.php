@@ -42,11 +42,13 @@ class EmergencyDonation extends Model
     protected static function booted(): void
     {
         static::saved(function ($donation) {
-            $donation->campaign->update([
-                'collected_amount' => $donation->campaign->donations()
-                    ->where('payment_status', 'completed')
-                    ->sum('converted_amount'),
-            ]);
+            if ($donation->wasChanged('payment_status') && $donation->payment_status === 'completed') {
+                $donation->campaign->update([
+                    'collected_amount' => $donation->campaign->donations()
+                        ->where('payment_status', 'completed')
+                        ->sum('converted_amount'),
+                ]);
+            }
         });
     }
 }

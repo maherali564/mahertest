@@ -45,7 +45,8 @@ class SliderResource extends Resource
             static::localeTabs('title', __('filament.pages.manage_site_settings.about_title')),
             static::localeTabs('subtitle', __('filament.resources.slider.subtitle'), 'textarea'),
             static::localeTabs('button_text', __('filament.resources.slider.button_text')),
-            Forms\Components\TextInput::make('button_link')->label(__('filament.resources.slider.button_link')),
+            Forms\Components\TextInput::make('button_link')->label(__('filament.resources.slider.button_link'))
+                ->url()->nullable(),
             Forms\Components\ColorPicker::make('text_color')->label(__('filament.resources.slider.text_color')),
             Forms\Components\Select::make('text_position')->label(__('filament.resources.slider.text_position'))->options([
                 'top-left' => '⬉ ' . __('filament.resources.slider.position_top_left'),

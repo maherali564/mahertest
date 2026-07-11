@@ -115,32 +115,50 @@ class VolunteerResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('approve')->label(__('filament.resources.volunteer.approve'))
                     ->icon('heroicon-o-check-circle')->color('success')
-                    ->visible(fn($record) => $record->status === 'pending')
-                    ->action(fn($record) => $record->update([
-                        'status' => 'approved', 'approved_at' => now(), 'rejected_at' => null, 'reviewed_by' => auth()->id(),
-                    ]))
+                    ->visible(fn($record) => $record->status === 'pending' && auth()->user()?->can('update_volunteer'))
+                    ->action(function ($record) {
+                        if (!\App\Models\User::find(auth()->id())) {
+                            \Filament\Notifications\Notification::make()->warning()->title(__('Invalid reviewer'))->send();
+                            return;
+                        }
+                        $record->update(['status' => 'approved', 'approved_at' => now(), 'rejected_at' => null, 'reviewed_by' => auth()->id()]);
+                    })
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('reject')->label(__('filament.resources.volunteer.reject'))
                     ->icon('heroicon-o-x-circle')->color('danger')
-                    ->visible(fn($record) => $record->status === 'pending')
-                    ->action(fn($record) => $record->update([
-                        'status' => 'rejected', 'rejected_at' => now(), 'approved_at' => null, 'reviewed_by' => auth()->id(),
-                    ]))
+                    ->visible(fn($record) => $record->status === 'pending' && auth()->user()?->can('update_volunteer'))
+                    ->action(function ($record) {
+                        if (!\App\Models\User::find(auth()->id())) {
+                            \Filament\Notifications\Notification::make()->warning()->title(__('Invalid reviewer'))->send();
+                            return;
+                        }
+                        $record->update(['status' => 'rejected', 'rejected_at' => now(), 'approved_at' => null, 'reviewed_by' => auth()->id()]);
+                    })
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     BulkAction::make('approveAll')->label(__('filament.resources.volunteer.approve_selected'))
                         ->icon('heroicon-o-check-circle')->color('success')
-                        ->action(fn(Collection $records) => $records->each->update([
-                            'status' => 'approved', 'approved_at' => now(), 'rejected_at' => null, 'reviewed_by' => auth()->id(),
-                        ]))
+                        ->visible(fn() => auth()->user()?->can('update_volunteer'))
+                        ->action(function (Collection $records) {
+                            if (!\App\Models\User::find(auth()->id())) {
+                                \Filament\Notifications\Notification::make()->warning()->title(__('Invalid reviewer'))->send();
+                                return;
+                            }
+                            $records->each->update(['status' => 'approved', 'approved_at' => now(), 'rejected_at' => null, 'reviewed_by' => auth()->id()]);
+                        })
                         ->requiresConfirmation(),
                     BulkAction::make('rejectAll')->label(__('filament.resources.volunteer.reject_selected'))
                         ->icon('heroicon-o-x-circle')->color('danger')
-                        ->action(fn(Collection $records) => $records->each->update([
-                            'status' => 'rejected', 'rejected_at' => now(), 'approved_at' => null, 'reviewed_by' => auth()->id(),
-                        ]))
+                        ->visible(fn() => auth()->user()?->can('update_volunteer'))
+                        ->action(function (Collection $records) {
+                            if (!\App\Models\User::find(auth()->id())) {
+                                \Filament\Notifications\Notification::make()->warning()->title(__('Invalid reviewer'))->send();
+                                return;
+                            }
+                            $records->each->update(['status' => 'rejected', 'rejected_at' => now(), 'approved_at' => null, 'reviewed_by' => auth()->id()]);
+                        })
                         ->requiresConfirmation(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),

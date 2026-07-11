@@ -23,7 +23,9 @@ class PageResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('slug')->required()->unique(ignoreRecord: true),
+            Forms\Components\TextInput::make('slug')->required()
+                ->unique(ignoreRecord: true)
+                ->regex('/^[a-z0-9-]+$/'),
             static::localeTabs('title', __('filament.pages.manage_site_settings.about_title')),
             static::localeTabs('content', __('filament.pages.manage_site_settings.about_content'), 'richtext'),
             static::localeTabs('meta_title', __('filament.resources.page.meta_title')),

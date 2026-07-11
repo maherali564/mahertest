@@ -100,8 +100,8 @@
 
                 <div class="story__meta" style="color:var(--color-text-muted);margin-bottom:1.5rem">
                     @if($story->person_name)<span><strong>{{ __('common.full_name') }}:</strong> {{ trans_field($story, 'person_name') }}</span>@endif
-                    @if($story->age)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>العمر:</strong> {{ $story->age }} {{ __('common.age') }}</span>@endif
-                    @if($story->location)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>الموقع:</strong> {{ trans_field($story, 'location') }}</span>@endif
+                    @if($story->age)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>{{ app()->getLocale() === 'ar' ? 'العمر' : 'Age' }}:</strong> {{ $story->age }} {{ __('common.age') }}</span>@endif
+                    @if($story->location)<span style="margin-{{ $isRtl ? 'right' : 'left' }}:1rem"><strong>{{ app()->getLocale() === 'ar' ? 'الموقع' : 'Location' }}:</strong> {{ trans_field($story, 'location') }}</span>@endif
                 </div>
 
                 <div class="donate-project__description">{!! safe_html(trans_field($story, 'content')) !!}</div>
@@ -130,7 +130,7 @@
 
                 @if($donations->isNotEmpty())
                 <div class="donate-project__donors">
-                    <h3><i aria-hidden="true" class="fas fa-users" style="color:var(--color-primary)"></i> {{ __('donor_wall.recent_donations') }}</h3>
+                    <h3><i aria-hidden="true" class="fas fa-users" style="color:var(--color-primary)"></i> {{ __('common.donor_wall.recent_donations') }}</h3>
                     <div class="donors-list">
                         @foreach($donations as $donation)
                         <div class="donors-list__item">
@@ -150,99 +150,66 @@
                 <div class="donate-project__donors donate-project__donors--empty">
                     <div style="text-align:center;padding:2rem;color:#94a3b8">
                         <i aria-hidden="true" class="fas fa-heart" style="font-size:2rem;color:#d1d5db;margin-bottom:0.75rem;display:block"></i>
-                        <p>{{ __('donor_wall.no_donations') }}</p>
+                        <p>{{ __('common.donor_wall.no_donations') }}</p>
                     </div>
                 </div>
                 @endif
             </div>
 
             <div class="donate-project__form">
-                <div class="donate-form-card">
-                    <h3>{{ __('donate.page_title') }}</h3>
-                    <form action="{{ route('donate.store', ['locale' => $currentLocale]) }}" method="POST" class="donate-form {{ $isRtl ? 'donate-form--rtl' : 'donate-form--ltr' }}">
-                        @csrf
-<input type="text" name="hp_website" tabindex="-1" autocomplete="off" style="position:fixed;top:-100px;left:0" aria-hidden="true">
+                <form class="donate-form" action="{{ route('donate.store', ['locale' => $currentLocale]) }}" method="POST">
+                    @csrf
+                    <input type="text" name="hp_website" tabindex="-1" autocomplete="off" class="hp-field" aria-hidden="true">
+                    <h3 class="donate-form__title">{{ __('common.donation_form') }}</h3>
 
-
-                        <div class="form-group">
-                            <label>{{ __('donate.select_story') }}</label>
+                        <div class="donate-form__amounts">
+                            <span class="donate-form__label">{{ __('donate.select_story') }}</span>
                             <select name="story_id" id="storySelect">
                                 <option value="">{{ __('donate.select_story') }}</option>
                                 @foreach($stories as $st)
-                                <option value="{{ $st->id }}" data-id="{{ $st->id }}">{{ trans_field($st, 'title') }}</option>
+                                <option value="{{ $st->id }}" data-slug="{{ $st->slug ?? $st->id }}">{{ trans_field($st, 'title') }}</option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label>{{ __('donate.quick_amounts') }}</label>
-                            <div class="amount-presets">
+                        <div class="donate-form__amounts">
+                            <span class="donate-form__label">{{ __('donate.quick_amounts') }}</span>
+                            <div class="donate-form__presets">
                                 @foreach([10, 25, 50, 100, 250, 500] as $preset)
-                                <button type="button" class="amount-preset" data-amount="{{ $preset }}">${{ $preset }}</button>
+                                <button type="button" data-amount="{{ $preset }}" class="donate-form__preset">${{ $preset }}</button>
                                 @endforeach
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>{{ __('donate.custom_amount') }}</label>
-                            <input type="number" name="amount" id="donationAmount" min="1" step="0.01" required placeholder="{{ __('donate.min_amount') }}">
+                        <div class="donate-form__fields">
+                            <label>
+                                <span class="donate-form__label">{{ __('donate.custom_amount') }}</span>
+                                <input type="number" name="amount" id="donationAmount" min="1" step="0.01" required placeholder="{{ __('donate.min_amount') }}">
+                            </label>
+                            <label>
+                                <span class="donate-form__label">{{ __('common.full_name') }}</span>
+                                <input type="text" name="donor_name" required>
+                            </label>
+                            <label>
+                                <span class="donate-form__label">{{ __('common.email') }}</span>
+                                <input type="email" name="email" required>
+                            </label>
                         </div>
 
-                        <div class="form-group">
-                            <label>{{ __('common.full_name') }}</label>
-                            <input type="text" name="donor_name" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>{{ __('common.email') }}</label>
-                            <input type="email" name="email" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>{{ __('common.phone') }}</label>
-                            <input type="tel" name="phone">
-                        </div>
-
-                        <div class="form-group">
-                            <label>{{ __('donate.payment_method') }}</label>
-                            <select name="payment_method_id" id="paymentMethodSelect" required>
-                                <option value="">{{ __('donate.select_payment_method') }}</option>
-                                @foreach($paymentMethods as $pm)
-                                <option value="{{ $pm->id }}" data-driver="{{ $pm->gateway?->driver ?? '' }}">{{ $pm->name }} - {{ $pm->description }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-checkboxes">
-                            <label class="checkbox-label">
+                        <div class="donate-form__checks">
+                            <label>
                                 <input type="checkbox" name="is_anonymous" value="1">
-                                <span>{{ __('donate.anonymous_donation') }}
-                                    <small>({{ __('donate.anonymous_hint') }})</small>
-                                </span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="is_recurring" value="1" id="recurringToggle">
-                                <span>{{ __('donate.recurring_donation') }}</span>
+                                <span>{{ __('donate.anonymous_donation') }}</span>
                             </label>
                         </div>
 
-                        <div id="recurringOptions" class="form-group" style="display:none">
-                            <label>{{ __('donate.recurring_interval') }}</label>
-                            <select name="recurring_interval">
-                                <option value="monthly">{{ __('donate.every_month') }}</option>
-                                <option value="quarterly">{{ __('donate.every_3_months') }}</option>
-                                <option value="yearly">{{ __('donate.every_year') }}</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>{{ __('donate.donation_note') }}</label>
+                        <label style="margin-top:12px">
+                            <span class="donate-form__label">{{ __('donate.donation_note') }}</span>
                             <textarea name="notes" rows="2"></textarea>
-                        </div>
+                        </label>
 
-                        <button type="submit" class="btn btn--primary btn--block btn--lg">{{ __('common.complete_donation') }}</button>
-                    </form>
-                </div>
+                        <button type="submit" class="btn btn--primary btn--block btn--lg donate-form__submit">{{ __('common.complete_donation') }}</button>
+                </form>
             </div>
         </div>
     </div>
@@ -571,12 +538,41 @@ html, body { overflow-x: hidden; }
 }
 .btn--block { width: 100%; }
 
+/* Campaign-style donation form */
+.donate-form { background:#fff; border:1px solid var(--color-border); border-radius:16px; padding:1.5rem; box-shadow:0 4px 24px rgba(0,0,0,0.06); position:sticky; top:90px; }
+.donate-form .donate-form__title,
+.donate-form h3.donate-form__title { font-size:1.15rem; font-weight:700; margin-bottom:1.25rem; color:var(--color-heading); text-align:center; }
+.donate-form .donate-form__label,
+.donate-form label > span.donate-form__label { font-size:0.78rem; font-weight:600; color:var(--color-text-muted); display:block; margin-bottom:6px; }
+.donate-form__amounts { margin-bottom:1rem; }
+.donate-form__amounts select { width:100%; padding:10px 14px; border:2px solid var(--color-border); border-radius:8px; font-size:0.9rem; outline:none; transition:border-color 0.2s; background:#fff; }
+.donate-form__amounts select:focus { border-color:var(--color-primary); }
+.donate-form__presets { display:flex; gap:6px; flex-wrap:wrap; }
+.donate-form__preset { padding:8px 16px; border:2px solid var(--color-border); border-radius:8px; background:#fff; font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.2s; color:var(--color-text); }
+.donate-form__preset:hover { border-color:var(--color-primary); color:var(--color-primary); }
+.donate-form__preset:focus { border-color:var(--color-primary); outline:none; }
+.donate-form__preset--active { border-color:var(--color-primary); background:#eff6ff; color:var(--color-primary); }
+.donate-form__fields { display:flex; flex-direction:column; gap:12px; }
+.donate-form__fields label { display:flex; flex-direction:column; gap:4px; }
+.donate-form__fields input,
+.donate-form__fields select,
+.donate-form__fields textarea { padding:10px 14px; border:2px solid var(--color-border); border-radius:8px; font-size:0.9rem; outline:none; transition:border-color 0.2s; background:#fff; }
+.donate-form__fields input:focus,
+.donate-form__fields select:focus,
+.donate-form__fields textarea:focus { border-color:var(--color-primary); }
+.donate-form__fields textarea { resize:vertical; }
+.donate-form__checks { display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap; }
+.donate-form__checks label { display:flex; align-items:center; gap:6px; cursor:pointer; }
+.donate-form__checks input { width:18px; height:18px; accent-color:var(--color-primary); }
+.donate-form__checks span { font-size:0.85rem; color:var(--color-text); }
+.donate-form__submit { margin-top:1.25rem; border-radius:10px; padding:14px; font-size:1rem; font-weight:700; }
+.hp-field { position:fixed; top:-100px; left:0; }
 
 @media (max-width: 900px) {
     .donate-project__grid {
         grid-template-columns: 1fr;
     }
-    .donate-form-card {
+    .donate-form {
         position: static;
     }
 }
@@ -624,12 +620,12 @@ document.addEventListener('keydown', function(e) {
 });
 
 (function() {
-    const presets = document.querySelectorAll('.amount-preset');
+    const presets = document.querySelectorAll('.donate-form__preset');
     const amountInput = document.getElementById('donationAmount');
     presets.forEach(btn => {
         btn.addEventListener('click', function() {
-            presets.forEach(b => b.classList.remove('amount-preset--active'));
-            this.classList.add('amount-preset--active');
+            presets.forEach(b => b.classList.remove('donate-form__preset--active'));
+            this.classList.add('donate-form__preset--active');
             amountInput.value = this.dataset.amount;
         });
     });
@@ -639,8 +635,8 @@ document.addEventListener('keydown', function(e) {
 
     document.getElementById('storySelect').addEventListener('change', function() {
         if (this.value) {
-            var id = this.options[this.selectedIndex].dataset.id;
-            window.location.href = '{{ route("donate.story", ["locale" => $currentLocale, "id" => "ID_PLACEHOLDER"]) }}'.replace('ID_PLACEHOLDER', id);
+            var slug = this.options[this.selectedIndex].dataset.slug;
+            window.location.href = '{{ route("donate.story", ["locale" => $currentLocale, "slug" => "SLUG_PLACEHOLDER"]) }}'.replace('SLUG_PLACEHOLDER', slug);
         }
     });
 

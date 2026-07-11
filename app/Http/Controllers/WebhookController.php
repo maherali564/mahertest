@@ -57,6 +57,11 @@ class WebhookController extends Controller
      */
     private function createRecurringDonation(Donation $parent, array $eventData, string $transactionId, string $subscriptionField = 'stripe_subscription_id'): Donation
     {
+        if ($transactionId && Donation::where('transaction_id', $transactionId)->exists()) {
+            Log::info('Duplicate recurring donation ignored', ['transaction_id' => $transactionId]);
+            return Donation::where('transaction_id', $transactionId)->first();
+        }
+
         $data = [
             'donor_id' => $parent->donor_id,
             'donor_name' => $parent->donor_name,
@@ -238,7 +243,7 @@ class WebhookController extends Controller
         }
 
         $payload = $request->getContent();
-        $headers = getallheaders();
+        $headers = $request->headers->all();
 
         $service = new PayPalService($gateway->config ?? []);
         if (!$service->verifyWebhookSignature($payload, $headers)) {

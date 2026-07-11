@@ -45,7 +45,7 @@ class Donation extends Model
         static::creating(function (self $donation) {
             if (empty($donation->access_token)) {
                 do {
-                    $donation->access_token = Str::random(64);
+                    $donation->access_token = hash_hmac('sha256', random_bytes(32), config('app.key'));
                 } while (static::where('access_token', $donation->access_token)->exists());
             }
         });
@@ -60,6 +60,27 @@ class Donation extends Model
     public function gateway()
     {
         return $this->hasOneThrough(PaymentGateway::class, PaymentMethod::class, 'id', 'id', 'payment_method_id', 'gateway_id');
+    }
+
+    /**
+     * Regenerate the access token after payment completion.
+     * This invalidates the old token so it can't be reused.
+     */
+    public function regenerateToken(): void
+    {
+        do {
+            $token = hash_hmac('sha256', random_bytes(32), config('app.key'));
+        } while (static::where('access_token', $token)->exists());
+
+        try {
+            $this->update(['access_token' => $token]);
+        } catch (\Exception $e) {
+            Log::error('Failed to regenerate token', [
+                'donation_id' => $this->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
     }
 
     public function project()

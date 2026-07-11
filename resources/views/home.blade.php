@@ -80,8 +80,8 @@
                 {{ app()->getLocale() === 'ar' ? 'عرض الكل' : 'View All' }} <i aria-hidden="true" class="fas fa-arrow-{{ $isRtl ? 'left' : 'right' }}"></i>
             </a>
         </div>
-        <div class="scroll-x">
-            <div class="scroll-x__track" id="ecTrack">
+        <div class="scroll-x{{ $emergencyCampaigns->count() <= 2 ? ' scroll-x--few' : '' }}">
+            <div class="scroll-x__track" id="ecTrack" data-count="{{ $emergencyCampaigns->count() }}">
                 @foreach($emergencyCampaigns as $ec)
                 <a href="{{ route('emergency-campaigns.show', ['locale' => $currentLocale, 'campaign' => $ec->slug]) }}" style="text-decoration:none;color:inherit;flex:0 0 280px;scroll-snap-align:start">
                     <article class="ec-card" style="border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.08);border-top:3px solid var(--color-danger);transition:transform .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
@@ -142,7 +142,7 @@
                 {{ __('common.view_all') }} <i aria-hidden="true" class="fas fa-arrow-{{ $isRtl ? 'left' : 'right' }}"></i>
             </a>
         </div>
-        <div class="scroll-x">
+        <div class="scroll-x{{ $projects->count() <= 3 ? ' scroll-x--few' : '' }}">
             <div class="scroll-x__track" id="projectsTrack">
                 @foreach($projects as $project)
                 <article class="project-card scroll-x__item">
@@ -185,7 +185,19 @@
     </div>
 </section>
 
-
+<section class="mission-statement section">
+    <div class="container">
+        <div class="mission-statement__inner">
+            <div class="mission-statement__icon">
+                <i aria-hidden="true" class="fas fa-hands-helping"></i>
+            </div>
+            <p class="mission-statement__text">{{ app()->getLocale() === 'ar' ? 'في قلب الأزمات تصنع المشاركة فارقاً حقيقياً في حياة الآخرين. نعمل بلا توقف لتقديم الدعم العاجل وبناء مستقبل مستدام للمجتمعات الأكثر احتياجاً. العطاء يبدأ بخطوة، والتمكين يتحقق بالتضامن. ساهم معنا يداً بيد من أجل الإنسانية.' : 'In the heart of crises, participation makes a real difference in the lives of others. We work tirelessly to provide urgent support and build a sustainable future for the most vulnerable communities. Giving begins with a step, and empowerment is achieved through solidarity. Join us hand in hand for humanity.' }}</p>
+            <div class="mission-statement__divider">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+</section>
 
 {{-- Stories: Voices Awaiting Life --}}
 @if($stories->isNotEmpty())
@@ -200,7 +212,7 @@
                 {{ __('common.view_all') }} <i aria-hidden="true" class="fas fa-arrow-{{ $isRtl ? 'left' : 'right' }}"></i>
             </a>
         </div>
-        <div class="scroll-x">
+        <div class="scroll-x{{ $stories->count() <= 3 ? ' scroll-x--few' : '' }}">
             <div class="scroll-x__track" id="storiesTrack">
                 @foreach($stories as $story)
                 <article class="story-card scroll-x__item">
@@ -225,7 +237,7 @@
                         </div>
                         @endif
                         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-                            <a href="{{ route('donate.story', ['locale' => $currentLocale, 'id' => $story->id]) }}" class="btn btn--primary btn--sm">{{ __('common.contribute') }}</a>
+                            <a href="{{ route('donate.story', ['locale' => $currentLocale, 'slug' => $story->slug ?? $story->id]) }}" class="btn btn--primary btn--sm">{{ __('common.contribute') }}</a>
                         </div>
                     </div>
                 </article>
@@ -357,27 +369,27 @@
                 </div>
                 <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:1.5rem;box-shadow:0 0 20px rgba(34,139,34,0.25),var(--shadow-sm);border:1px solid rgba(34,139,34,0.3)">
                     <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:0.75rem;color:var(--color-text-muted);display:flex;align-items:center;gap:0.5rem"><i aria-hidden="true" class="fas fa-shield-alt" style="color:var(--color-primary)"></i> {{ app()->getLocale() === 'ar' ? 'الشفافية والتوثيق' : 'Transparency & Trust' }}</h4>
-                    <p style="font-size:0.78rem;line-height:1.7;color:var(--color-text-muted);margin-bottom:1rem">تخضع منظمة ساهم الدولية للاغاثة والتنمية لقوانين الاتحاد الاوروبي وتمتثل بعملها وفق اعلى معايير الحوكمة والشفافية المالية والإدارية. ونلتزم بأمن المعلومات وبقواعد أمان صارمة ونزاهة مؤسسية تضمن إيصال المساعدات لمستحقيها بكل مسؤولية وموثوقية قانونية</p>
+                    <p style="font-size:0.78rem;line-height:1.7;color:var(--color-text-muted);margin-bottom:1rem">{{ app()->getLocale() === 'ar' ? 'تخضع منظمة ساهم الدولية للاغاثة والتنمية لقوانين الاتحاد الاوروبي وتمتثل بعملها وفق اعلى معايير الحوكمة والشفافية المالية والإدارية. ونلتزم بأمن المعلومات وبقواعد أمان صارمة ونزاهة مؤسسية تضمن إيصال المساعدات لمستحقيها بكل مسؤولية وموثوقية قانونية' : 'Sahem International Relief and Development Organization is governed by EU laws and complies with the highest standards of governance, financial and administrative transparency. We are committed to information security, strict safety rules, and institutional integrity to ensure aid reaches those entitled to it with full responsibility and legal reliability.' }}</p>
                     <div class="contact-trust-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
                             <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-lock"></i></div>
                             <strong style="font-size:0.8rem;line-height:1.3">SSL Secured</strong>
-                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">مشفّر 256-bit</span>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">{{ app()->getLocale() === 'ar' ? 'مشفّر 256-bit' : '256-bit Encrypted' }}</span>
                         </div>
                         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
                             <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-credit-card"></i></div>
-                            <strong style="font-size:0.8rem;line-height:1.3">متوافق مع PCI</strong>
-                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">أمان المدفوعات</span>
+                            <strong style="font-size:0.8rem;line-height:1.3">{{ app()->getLocale() === 'ar' ? 'متوافق مع PCI' : 'PCI Compliant' }}</strong>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">{{ app()->getLocale() === 'ar' ? 'أمان المدفوعات' : 'Payment Security' }}</span>
                         </div>
                         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
                             <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-certificate"></i></div>
-                            <strong style="font-size:0.8rem;line-height:1.3">مرخصة رسمياً</strong>
-                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">منظمة مسجلة</span>
+                            <strong style="font-size:0.8rem;line-height:1.3">{{ app()->getLocale() === 'ar' ? 'مرخصة رسمياً' : 'Officially Licensed' }}</strong>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">{{ app()->getLocale() === 'ar' ? 'منظمة مسجلة' : 'Registered Organization' }}</span>
                         </div>
                         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:14px 10px;text-align:center">
                             <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;margin-bottom:2px"><i aria-hidden="true" class="fas fa-hand-holding-heart"></i></div>
-                            <strong style="font-size:0.8rem;line-height:1.3">جهة خيرية رسمية</strong>
-                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">معتمد وموثق</span>
+                            <strong style="font-size:0.8rem;line-height:1.3">{{ app()->getLocale() === 'ar' ? 'جهة خيرية رسمية' : 'Official Charity' }}</strong>
+                            <span style="font-size:0.65rem;color:var(--color-text-muted);line-height:1.2">{{ app()->getLocale() === 'ar' ? 'معتمد وموثق' : 'Certified & Verified' }}</span>
                         </div>
                     </div>
                 </div>
@@ -391,12 +403,26 @@
 @endsection
 
 @push('head')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="{{ asset('css/swiper-bundle.min.css') }}" />
 <style>
 .contact__grid--rtl { flex-direction: row-reverse; }
 .contact__grid--ltr { flex-direction: row; }
-@media (max-width:640px) { .contact-trust-grid { grid-template-columns:1fr !important; } }
+
 .project-card__actions { display: flex; gap: 8px; margin-top: 12px; }
+
+.mission-statement { padding: 3rem 0; }
+.mission-statement__inner { max-width: 780px; margin: 0 auto; text-align: center; }
+.mission-statement__icon { width: 64px; height: 64px; margin: 0 auto 1.25rem; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), #1a6b3c); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 30px rgba(34,139,34,0.25),0 6px 18px rgba(34,139,34,0.2); position:relative; animation: homeTrustFloat 2s ease-in-out infinite; }
+.mission-statement__icon::after { content:''; position:absolute; inset:-6px; border-radius:50%; border:2px solid rgba(34,139,34,0.3); animation:homeTrustPulse 1.5s ease-in-out infinite; }
+.mission-statement__text { font-size: 1.05rem; line-height: 1.9; color: var(--color-text); font-weight: 500; margin-bottom: 1.25rem; }
+.mission-statement__divider { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.mission-statement__divider span { width: 40px; height: 3px; border-radius: 2px; background: var(--color-primary); opacity: 0.3; }
+.mission-statement__divider span:nth-child(2) { width: 60px; opacity: 0.6; }
+@media (max-width:640px) {
+    .mission-statement { padding: 2rem 0; }
+    .mission-statement__text { font-size: 0.92rem; line-height: 1.8; }
+    .mission-statement__icon { width: 52px; height: 52px; font-size: 1.2rem; }
+}
 .project-card__actions .btn--primary { order: 0; }
 .project-card__actions .btn--outline { order: 1; }
 .project-progress { margin: 10px 0; }
@@ -416,7 +442,6 @@
 
 .hero-slide__title { font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 900; margin-bottom: 12px; line-height: 1.2; text-shadow: 0 4px 30px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3); letter-spacing: -0.02em; }
 
-.hero-slide__title::after { content: ''; display: block; width: 60px; height: 4px; border-radius: 2px; margin: 16px auto 0; background: currentColor; opacity: .5; }
 
 .hero-slide__subtitle { font-size: clamp(1rem, 1.5vw, 1.2rem); opacity: 0.92; margin-bottom: 24px; line-height: 1.7; text-shadow: 0 2px 20px rgba(0,0,0,0.4); max-width: 580px; margin-inline: auto; }
 
@@ -444,12 +469,7 @@
 
 /* Pagination Dots */
 .hero-slider .swiper-pagination { bottom: 28px !important; z-index: 3; }
-.hero-slider .swiper-pagination-bullet {
-    width: 12px; height: 12px; background: rgba(255,255,255,0.4);
-    opacity: 1; border-radius: 50%; margin: 0 6px !important;
-    transition: all 0.3s; cursor: pointer; border: 2px solid rgba(255,255,255,0.5);
-}
-.hero-slider .swiper-pagination-bullet-active { background: #fff; transform: scale(1.2); border-color: #fff; }
+.hero-slider .swiper-pagination-bullet { display: none; }
 
 /* Slide animations */
 .hero-slide__title, .hero-slide__subtitle, .hero-slide__action {
@@ -468,20 +488,17 @@
     .hero-slide { min-height: 60vh; }
     .hero-slide__content { padding: 20px; }
     .hero-slide__title { font-size: clamp(1.5rem, 5vw, 2.2rem); }
-    .hero-slide__title::after { width: 40px; height: 3px; margin-top: 12px; }
     .hero-slide__subtitle { margin-bottom: 20px; font-size: clamp(0.9rem, 2vw, 1rem); }
     .hero-slider .swiper-button-next,
     .hero-slider .swiper-button-prev { width: 36px; height: 36px; margin-top: -18px; font-size: 14px; border-width: 1.5px; }
     .hero-slider .swiper-button-next { inset-inline-end: 10px; }
     .hero-slider .swiper-button-prev { inset-inline-start: 10px; }
-    .hero-slider .swiper-pagination { bottom: 14px !important; }
-    .hero-slider .swiper-pagination-bullet { width: 8px; height: 8px; border-width: 1.5px; }
+    .hero-slider .swiper-pagination { display: none; }
 }
 @media (max-width: 480px) {
     .hero-slide { min-height: 50vh; }
     .hero-slide__content { padding: 16px; }
-    .hero-slide__title { margin-bottom: 8px; font-size: clamp(1.3rem, 6vw, 1.6rem); }
-    .hero-slide__title::after { width: 30px; height: 2px; margin-top: 10px; }
+    .hero-slide__title { margin-bottom: 8px; font-size: clamp(1.3rem, 6vw, 1.6rem); text-align: center; }
     .hero-slide__subtitle { margin-bottom: 16px; }
     .hero-slide__action .btn--primary { padding: 10px 24px; font-size: .9rem; }
 }
@@ -506,6 +523,10 @@
 @media (max-width:768px) {
     .scroll-x__btn { display:none; }
     .scroll-x__item { flex:0 0 240px; }
+    /* When only 2 campaigns: stack vertically on mobile */
+    .scroll-x--few .scroll-x__track { flex-direction:column; gap:1rem; overflow-x:visible; scroll-snap-type:none; }
+    .scroll-x--few .scroll-x__item { flex:0 0 auto; width:100%; }
+    .scroll-x--few .scroll-x__btn { display:none; }
 }
 
 /* Section Title Accent */
@@ -588,8 +609,7 @@
 .scroll-top.visible { display: flex; }
 .scroll-top i, .dark-mode-toggle i { display: inline-block; }
 
-/* Force swiper wrapper to 0 in fade (prevents RTL translate drift on mobile) */
-.heroSwiper .swiper-wrapper { transform: translate3d(0,0,0) !important; }
+/* Swiper handles transforms internally for fade effect */
 
 /* Hero Map Section */
 .hm-section { background:linear-gradient(135deg,#0b1a2e,#13294b,#0b1a2e); color:#e2e8f0; }
@@ -604,14 +624,15 @@
 /* Trust Card */
 .hm-section--light { background:#f8fafc !important; color:#1e293b; }
 .hm-trust-card { background:#fff; border:1px solid #e2e8f0; border-radius:20px; padding:2.5rem 2rem; text-align:center; max-width:860px; margin:0 auto; box-shadow: 0 16px 64px rgba(13, 107, 79, 0.55), 0 0 80px rgba(13, 107, 79, 0.15);; }
-.hm-trust-icon-wrap { width:72px; height:72px; margin:0 auto 1.25rem; display:flex; align-items:center; justify-content:center; border-radius:50%; background:linear-gradient(135deg,#0d6b4f,#0a9c6e); font-size:2rem; color:#fff; box-shadow:0 4px 20px rgba(13,107,79,0.4); }
+.hm-trust-icon-wrap { width:72px; height:72px; margin:0 auto 1.25rem; display:flex; align-items:center; justify-content:center; border-radius:50%; background:linear-gradient(135deg,#0d6b4f,#0a9c6e); font-size:2rem; color:#fff; box-shadow:0 0 30px rgba(13,107,79,0.25),0 6px 18px rgba(13,107,79,0.2); position:relative; animation:homeTrustFloat 2s ease-in-out infinite; }
+.hm-trust-icon-wrap::after { content:''; position:absolute; inset:-6px; border-radius:50%; border:2px solid rgba(13,107,79,0.3); animation:homeTrustPulse 1.5s ease-in-out infinite; }
 .hm-trust-text { font-size:1.1rem; font-weight:500; line-height:1.8; margin:0; color:#475569; max-width:720px; margin-inline:auto; }
 
 </style>
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="{{ asset('js/swiper-bundle.min.js') }}" nonce="{{ $cspNonce }}"></script>
 <script nonce="{{ $cspNonce }}">
 function scrollTrack(id, dir) {
     var t = document.getElementById(id);
@@ -628,28 +649,26 @@ function scrollTrack(id, dir) {
 </script>
 <script nonce="{{ $cspNonce }}">
 document.addEventListener('DOMContentLoaded', function () {
-    const swiperEl = document.querySelector('.heroSwiper');
-    if (!swiperEl) return;
+    try {
+        const swiperEl = document.querySelector('.heroSwiper');
+        if (!swiperEl) { console.warn('Swiper: .heroSwiper not found'); return; }
 
-    const slideCount = document.querySelectorAll('.heroSwiper .swiper-slide').length;
-    const heroSwiper = new Swiper('.heroSwiper', {
-        loop: slideCount > 1,
-        speed: 800,
-        rtl: {{ $isRtl ? 'true' : 'false' }},
-        autoplay: { delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true },
-        pagination: { el: '.swiper-pagination', clickable: true },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        effect: 'fade',
-        fadeEffect: { crossFade: true },
-        keyboard: { enabled: true },
-    });
+        const slideCount = document.querySelectorAll('.heroSwiper .swiper-slide').length;
+        if (slideCount === 0) { console.warn('Swiper: no slides found'); return; }
 
-    // Pause on hover
-    swiperEl.addEventListener('mouseenter', () => heroSwiper.autoplay.stop());
-    swiperEl.addEventListener('mouseleave', () => heroSwiper.autoplay.start());
+        var heroSwiper = new Swiper('.heroSwiper', {
+            loop: slideCount > 1,
+            speed: 800,
+            rtl: {{ $isRtl ? 'true' : 'false' }},
+            autoplay: { delay: 10000, disableOnInteraction: false },
+            pagination: { el: '.swiper-pagination', clickable: true },
+            effect: 'fade',
+            fadeEffect: { crossFade: true },
+            keyboard: { enabled: true },
+        });
+    } catch (e) {
+        console.error('Swiper init error:', e);
+    }
 });
 </script>
 @endpush

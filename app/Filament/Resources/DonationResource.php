@@ -73,12 +73,13 @@ class DonationResource extends Resource
                 'stripe' => 'success',
                 default => 'gray',
             })->toggleable(),
-            Tables\Columns\SelectColumn::make('status')->label(__('filament.widgets.latest_donations.column_status'))->options([
-                'pending' => __('filament.resources.donation.status_pending'),
-                'completed' => __('filament.resources.donation.status_completed'),
-                'failed' => __('filament.resources.donation.status_failed'),
-                'cancelled' => __('filament.resources.donation_submission.status_cancelled'),
-            ]),
+            Tables\Columns\TextColumn::make('status')->label(__('filament.widgets.latest_donations.column_status'))->badge()->color(fn ($state) => match ($state) {
+                'pending' => 'warning',
+                'completed' => 'success',
+                'failed' => 'danger',
+                'cancelled' => 'gray',
+                default => 'gray',
+            }),
             Tables\Columns\TextColumn::make('project.title')->label(__('filament.resources.donation.column_project'))->formatStateUsing(fn ($state) => \Illuminate\Support\Str::limit($state, 20))->toggleable(),
             Tables\Columns\TextColumn::make('story.title')->label(__('filament.resources.donation.column_story'))->formatStateUsing(fn ($state) => \Illuminate\Support\Str::limit($state, 20))->toggleable(),
 
@@ -111,7 +112,18 @@ class DonationResource extends Resource
                 Tables\Actions\Action::make('export_csv')->label(__('filament.resources.donation.export_csv'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
+                    ->visible(fn () => auth()->user()?->hasRole('super_admin'))
                     ->action(function () {
+                        $key = 'export_csv_' . auth()->id() . '_' . now()->format('Y-m-d');
+                        if (\Illuminate\Support\Facades\Cache::get($key, 0) >= 1) {
+                            \Filament\Notifications\Notification::make()
+                                ->warning()
+                                ->title(__('filament.resources.donation.export_limit'))
+                                ->send();
+                            return;
+                        }
+                        \Illuminate\Support\Facades\Cache::increment($key);
+                        \Illuminate\Support\Facades\Cache::put($key, \Illuminate\Support\Facades\Cache::get($key, 0), 86400);
                         return static::streamCsv('donations-', Donation::query()->orderByDesc('created_at')->get());
                     }),
             ])
@@ -122,6 +134,16 @@ class DonationResource extends Resource
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('info')
                         ->action(function ($records) {
+                            $key = 'export_csv_' . auth()->id() . '_' . now()->format('Y-m-d');
+                            if (\Illuminate\Support\Facades\Cache::get($key, 0) >= 3) {
+                                \Filament\Notifications\Notification::make()
+                                    ->warning()
+                                    ->title(__('filament.resources.donation.export_limit'))
+                                    ->send();
+                                return;
+                            }
+                            \Illuminate\Support\Facades\Cache::increment($key);
+                            \Illuminate\Support\Facades\Cache::put($key, \Illuminate\Support\Facades\Cache::get($key, 0), 86400);
                             return static::streamCsv('donations-selected-', $records);
                         }),
                 ]),
@@ -140,7 +162,9 @@ class DonationResource extends Resource
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($file, [__('filament.resources.donation.column_donor'), __('filament.resources.newsletter.column_email'), __('filament.widgets.latest_donations.column_amount'), __('filament.resources.donation.column_method'), __('filament.widgets.latest_donations.column_status'), __('filament.resources.donation.filter_date')]);
             foreach ($donations as $d) {
-                fputcsv($file, [$d->donor_name, $d->email, number_format($d->amount, 2), $d->paymentMethod?->name ?? '—', $d->status, $d->created_at->format('Y-m-d H:i')]);
+                $name = $d->is_anonymous ? (__('filament.resources.donation.anonymous')) : $d->donor_name;
+                $email = $d->is_anonymous ? '**********' : $d->email;
+                fputcsv($file, [$name, $email, number_format($d->amount, 2), $d->paymentMethod?->name ?? '—', $d->status, $d->created_at->format('Y-m-d H:i')]);
             }
             fclose($file);
         };

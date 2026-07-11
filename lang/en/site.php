@@ -2,7 +2,7 @@
 
 return [
     'about_title' => 'About Us',
-    'about_desc' => 'Learn our story, mission, and vision',
+    'about_desc' => 'An international organization working to provide urgent relief and sustainable development to affected communities worldwide.',
     'our_story' => 'Our Story',
     'story_title' => 'Together We Make Hope for Those in Need',
     'story_p1' => 'Our humanitarian journey began from the heart of suffering, where we witnessed firsthand the urgent need for humanitarian aid in affected areas. We launched with a clear vision: providing relief and development support to needy families without discrimination.',
@@ -22,6 +22,12 @@ return [
     'value_impact_desc' => 'We strive to achieve the maximum positive impact by directing resources where the need is greatest.',
     'value_compassion_title' => 'Compassion',
     'value_compassion_desc' => 'We place humanity at the heart of everything we do, treating everyone with dignity and respect regardless of background.',
+    'value_rapid_response_title' => 'Rapid Response',
+    'value_rapid_response_desc' => 'We reach affected people as quickly as possible to save lives and alleviate suffering.',
+    'value_stewardship_title' => 'Stewardship',
+    'value_stewardship_desc' => 'We safeguard the trust of donations and guarantee they reach those who deserve them with accuracy and accountability.',
+    'value_empowerment_title' => 'Empowerment',
+    'value_empowerment_desc' => 'We work to empower individuals and communities to achieve sustainable self-sufficiency.',
     'our_partners' => 'Our Partners',
     'partners_title' => 'Who We Collaborate With',
     'partners_desc' => 'We are proud to collaborate with local and international partners to maximize our impact',

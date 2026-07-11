@@ -81,33 +81,7 @@
             <a href="{{ route('home', ['locale' => $currentLocale]) }}#contact" class="btn btn--primary">{{ __('common.contact_us') }}</a>
         </div>
 
-        <div style="margin-top:2rem;background:var(--color-bg);border-radius:var(--radius-md);padding:2rem;box-shadow:0 0 20px rgba(34,139,34,0.15),var(--shadow-sm);border:1px solid rgba(34,139,34,0.25)">
-            <div style="text-align:center;max-width:700px;margin:0 auto 1.5rem">
-                <p style="font-size:0.9rem;line-height:1.8;color:var(--color-text-muted)">تخضع منظمة ساهم الدولية للاغاثة والتنمية لقوانين الاتحاد الاوروبي وتمتثل بعملها وفق اعلى معايير الحوكمة والشفافية المالية والإدارية. ونلتزم بأمن المعلومات وبقواعد أمان صارمة ونزاهة مؤسسية تضمن إيصال المساعدات لمستحقيها بكل مسؤولية وموثوقية قانونية</p>
-            </div>
-            <div class="trust-badges-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:500px;margin:0 auto">
-                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:18px 12px;text-align:center">
-                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;margin-bottom:4px"><i aria-hidden="true" class="fas fa-lock"></i></div>
-                    <strong style="font-size:0.85rem;line-height:1.3">SSL Secured</strong>
-                    <span style="font-size:0.7rem;color:var(--color-text-muted);line-height:1.2">مشفّر 256-bit</span>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:18px 12px;text-align:center">
-                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;margin-bottom:4px"><i aria-hidden="true" class="fas fa-credit-card"></i></div>
-                    <strong style="font-size:0.85rem;line-height:1.3">متوافق مع PCI</strong>
-                    <span style="font-size:0.7rem;color:var(--color-text-muted);line-height:1.2">أمان المدفوعات</span>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:18px 12px;text-align:center">
-                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;margin-bottom:4px"><i aria-hidden="true" class="fas fa-certificate"></i></div>
-                    <strong style="font-size:0.85rem;line-height:1.3">مرخصة رسمياً</strong>
-                    <span style="font-size:0.7rem;color:var(--color-text-muted);line-height:1.2">منظمة مسجلة</span>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.5);border:1px solid var(--color-border);border-radius:12px;padding:18px 12px;text-align:center">
-                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),#1a6b3c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;margin-bottom:4px"><i aria-hidden="true" class="fas fa-hand-holding-heart"></i></div>
-                    <strong style="font-size:0.85rem;line-height:1.3">جهة خيرية رسمية</strong>
-                    <span style="font-size:0.7rem;color:var(--color-text-muted);line-height:1.2">معتمد وموثق</span>
-                </div>
-            </div>
-        </div>
+       
     </div>
 </section>
 @endsection

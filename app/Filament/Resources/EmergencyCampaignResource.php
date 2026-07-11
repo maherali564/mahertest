@@ -70,7 +70,8 @@ class EmergencyCampaignResource extends Resource
                     FileUpload::make('video')
                         ->directory('videos')
                         ->nullable()
-                        ->acceptedFileTypes(['video/mp4']),
+                        ->maxSize(102400)
+                        ->acceptedFileTypes(['video/mp4', 'video/webm']),
                 ]),
 
             Section::make(__('filament.resources.emergency_campaign.section.status_schedule'))
@@ -127,10 +128,8 @@ class EmergencyCampaignResource extends Resource
                             $set('target_flag', $coords['flag']);
                             $set('target_location', $coords['loc']);
                         }),
-                    Hidden::make('target_latitude'),
-                    Hidden::make('target_longitude'),
-                    Hidden::make('target_country_code'),
-                    Hidden::make('target_flag'),
+                    // Coordinates are computed server-side in the model's saving event
+                    // (Hidden fields removed to prevent client-side manipulation)
                     TextInput::make('target_location')->label('الموقع')->nullable(),
                 ])->columns(2),
 

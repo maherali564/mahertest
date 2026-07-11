@@ -1,8 +1,9 @@
+@php $isAr = app()->getLocale() === 'ar'; @endphp
 <div id="donate-form" class="ec-donation-card">
     <div class="ec-donation-header">
         <i aria-hidden="true" class="fas fa-hand-holding-heart"></i>
-        <h2>تبرع الآن وأنقذ حياة</h2>
-        <p>اختر المبلغ الذي ترغب بالتبرع به</p>
+        <h2>{{ $isAr ? 'تبرع الآن وأنقذ حياة' : 'Donate Now and Save a Life' }}</h2>
+        <p>{{ $isAr ? 'اختر المبلغ الذي ترغب بالتبرع به' : 'Choose the amount you wish to donate' }}</p>
     </div>
 
     <div class="ec-quick-amounts">
@@ -14,7 +15,7 @@
         </button>
         <button type="button" class="ec-amount-btn featured" data-amount="250">
             <span class="ec-amount-value">250</span>
-            <span class="ec-amount-badge">الأكثر شيوعاً</span>
+            <span class="ec-amount-badge">{{ $isAr ? 'الأكثر شيوعاً' : 'Most Popular' }}</span>
         </button>
         <button type="button" class="ec-amount-btn" data-amount="500">
             <span class="ec-amount-value">500</span>
@@ -36,37 +37,37 @@
 
         <div class="ec-floating-input">
             <input type="number" name="amount" id="donation-amount" required min="1" placeholder=" ">
-            <label for="donation-amount">مبلغ آخر</label>
+            <label for="donation-amount">{{ $isAr ? 'مبلغ آخر' : 'Custom Amount' }}</label>
             <i aria-hidden="true" class="fas fa-money-bill-wave ec-input-icon"></i>
         </div>
 
         <div class="ec-floating-input">
             <input type="text" name="donor_name" id="donor-name" required placeholder=" " maxlength="100">
-            <label for="donor-name">الاسم الكامل</label>
+            <label for="donor-name">{{ $isAr ? 'الاسم الكامل' : 'Full Name' }}</label>
             <i aria-hidden="true" class="fas fa-user ec-input-icon"></i>
         </div>
 
         <div class="ec-floating-input">
             <input type="email" name="donor_email" id="donor-email" required placeholder=" " maxlength="255">
-            <label for="donor-email">البريد الإلكتروني</label>
+            <label for="donor-email">{{ $isAr ? 'البريد الإلكتروني' : 'Email' }}</label>
             <i aria-hidden="true" class="fas fa-envelope ec-input-icon"></i>
         </div>
 
         <div class="ec-floating-input">
             <textarea name="message" id="donor-message" rows="2" placeholder=" " maxlength="500"></textarea>
-            <label for="donor-message">رسالتك (اختياري)</label>
+            <label for="donor-message">{{ $isAr ? 'رسالتك (اختياري)' : 'Your Message (optional)' }}</label>
             <i aria-hidden="true" class="fas fa-comment ec-input-icon"></i>
         </div>
 
         <button type="submit" class="ec-donate-submit-btn" id="donate-btn">
             <i aria-hidden="true" class="fas fa-heart"></i>
-            <span>أنا أتبرع الآن</span>
+            <span>{{ $isAr ? 'أنا أتبرع الآن' : 'Donate Now' }}</span>
             <div class="ec-btn-shimmer"></div>
         </button>
 
         <div class="ec-security-note">
             <i aria-hidden="true" class="fas fa-lock"></i>
-            تبرع آمن ومشفر بالكامل
+            {{ $isAr ? 'تبرع آمن ومشفر بالكامل' : 'Secure & Fully Encrypted Donation' }}
         </div>
     </form>
 </div>

@@ -13,30 +13,7 @@
 <section class="donate-section">
     <div class="container donate-section__inner">
         <div class="donate-grid">
-            <aside class="donate-info">
-                <h3 class="donate-info__heading"><i aria-hidden="true" class="fas fa-credit-card"></i>{{ __('common.payment_methods') }}</h3>
-                <div class="donate-info__methods">
-                    @foreach($paymentMethods as $pm)
-                    <div class="donate-info__method" data-method-id="{{ $pm->id }}">
-                        <div class="donate-info__method-icon">
-                            @if($pm->gateway && $pm->gateway->logo)
-                            <img loading="lazy" src="{{ asset('storage/'.$pm->gateway->logo) }}" alt="{{ $pm->name }}">
-                            @elseif($pm->icon)
-                            <i class="{{ $pm->icon }}"></i>
-                            @else
-                            <i aria-hidden="true" class="fas fa-wallet"></i>
-                            @endif
-                        </div>
-                        <div>
-                            <strong>{{ $pm->name }}</strong>
-                            @if($pm->description)
-                            <span>{{ $pm->description }}</span>
-                            @endif
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </aside>
+            
 
             <div class="donate-form-wrap">
                 <form class="donate-form" action="{{ route('donate.store', ['locale' => $currentLocale]) }}" method="POST">
@@ -121,7 +98,7 @@
 <style>
 .donate-section { padding: 3rem 0; }
 .donate-section__inner { max-width: 1100px; }
-.donate-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
+.donate-grid { display:grid; grid-template-columns:1fr; gap:2rem; align-items:start; max-width:600px; margin:0 auto; }
 .donate-info__heading { font-size:1.1rem; font-weight:700; margin-bottom:1rem; color:var(--color-heading); }
 .donate-info__heading i { color:var(--color-primary); margin-inline-end:8px; }
 .donate-info__methods { display:grid; grid-template-columns:1fr 1fr; gap:8px; }

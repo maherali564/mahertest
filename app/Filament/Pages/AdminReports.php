@@ -17,6 +17,14 @@ class AdminReports extends Page
 
     protected static string $view = 'filament.pages.admin-reports';
 
+    /** Restrict to users with view_donation permission or super_admin. */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('view_any_report')
+            || auth()->user()?->can('view_donation')
+            || auth()->user()?->hasRole('super_admin');
+    }
+
     public ?string $dateFrom = null;
     public ?string $dateTo = null;
     public ?string $period = 'monthly';
@@ -49,8 +57,11 @@ class AdminReports extends Page
     /** Get chart data grouped by month or year for the selected period. */
     public function getChartData(): array
     {
+        $allowedPeriods = ['monthly', 'yearly'];
+        $period = in_array($this->period, $allowedPeriods, true) ? $this->period : 'monthly';
+
         $driver = DB::connection()->getDriverName();
-        $dateExpr = $this->period === 'yearly'
+        $dateExpr = $period === 'yearly'
             ? ($driver === 'pgsql' ? "TO_CHAR(created_at, 'YYYY')" : "strftime('%Y', created_at)")
             : ($driver === 'pgsql' ? "TO_CHAR(created_at, 'YYYY-MM')" : "strftime('%Y-%m', created_at)");
 

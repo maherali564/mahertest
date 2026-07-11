@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Slider extends Model
 {
@@ -25,5 +26,11 @@ class Slider extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true)->orderBy('sort_order');
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('home_sliders'));
+        static::deleted(fn () => Cache::forget('home_sliders'));
     }
 }

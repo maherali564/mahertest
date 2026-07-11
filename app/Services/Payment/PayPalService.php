@@ -51,6 +51,7 @@ class PayPalService
     {
         $token = $this->getAccessToken();
         if (!$token) {
+            Log::error('PayPal: Failed to get access token', ['donation_id' => $donation->id]);
             return null;
         }
 
@@ -67,7 +68,7 @@ class PayPalService
             'payment_source' => [
                 'paypal' => [
                     'experience_context' => [
-                        'return_url' => route('payment.success', ['locale' => $donation->locale, 'donation' => $donation->id], true),
+                        'return_url' => route('payment.success', ['locale' => $donation->locale, 'donation' => $donation->id, 'token' => $donation->access_token], true),
                         'cancel_url' => route('payment.cancel', ['locale' => $donation->locale, 'donation' => $donation->id, 'token' => $donation->access_token], true),
                     ],
                 ],
@@ -75,6 +76,11 @@ class PayPalService
         ]);
 
         if (!$response->successful()) {
+            Log::error('PayPal: Order creation failed', [
+                'donation_id' => $donation->id,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
             return null;
         }
 
@@ -117,11 +123,13 @@ class PayPalService
     {
         $webhookId = $this->config['webhook_id'] ?? '';
         if (empty($webhookId)) {
+            Log::error('PayPal webhook ID is not configured');
             throw new RuntimeException('PayPal webhook ID is not configured');
         }
 
         $token = $this->getAccessToken();
         if (!$token) {
+            Log::error('PayPal: Failed to get access token for webhook verification');
             return false;
         }
 

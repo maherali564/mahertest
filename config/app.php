@@ -8,7 +8,10 @@ return [
     'timezone' => env('APP_TIMEZONE', 'Asia/Gaza'),
     'locale' => env('APP_LOCALE', 'ar'),
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
-    'supported_locales' => array_filter(explode(',', env('APP_SUPPORTED_LOCALES', 'ar,en,es'))),
+    'supported_locales' => array_values(array_filter(
+        explode(',', env('APP_SUPPORTED_LOCALES', 'ar,en,es,id,tr,sv')),
+        fn($locale) => in_array($locale, ['ar', 'en', 'es', 'id', 'tr', 'sv'])
+    )),
     'faker_locale' => env('APP_FAKER_LOCALE', 'ar_SA'),
     'cipher' => 'AES-256-CBC',
     'key' => env('APP_KEY'),

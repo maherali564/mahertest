@@ -41,4 +41,12 @@ class PostPolicy
     {
         return $user->can('delete_post');
     }
+
+    /**
+     * Publishing requires explicit permission or editor/admin role.
+     */
+    public function publish(User $user, Post $post): bool
+    {
+        return $user->can('publish_post') || $user->hasRole('editor') || $user->hasRole('admin');
+    }
 }

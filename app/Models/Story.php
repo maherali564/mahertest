@@ -14,7 +14,7 @@ class Story extends Model
     use HasTranslations;
 
     protected $fillable = [
-        'title', 'content', 'excerpt', 'person_name', 'age',
+        'slug', 'title', 'content', 'excerpt', 'person_name', 'age',
         'location', 'image', 'images', 'video_url', 'video_type', 'videos', 'video_thumbnails', 'goal_amount', 'raised_amount',
         'is_active', 'sort_order',
     ];
@@ -60,7 +60,10 @@ class Story extends Model
     protected static function booted(): void
     {
         static::saved(function (Story $story) {
-            if (!empty($story->videos) || $story->video_url) {
+            $videoChanged = $story->wasChanged('videos') || $story->wasChanged('video_url');
+            $hasVideos = !empty($story->videos) || $story->video_url;
+
+            if ($videoChanged && $hasVideos) {
                 ProcessVideosJob::dispatch(Story::class, $story->id);
             }
         });
@@ -69,6 +72,8 @@ class Story extends Model
     public static function ffmpegPath(): ?string
     {
         $path = config('services.ffmpeg.path', 'ffmpeg');
+        $allowed = ['ffmpeg', '/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg'];
+        if ($path !== 'ffmpeg' && !in_array($path, $allowed, true)) return null;
         if ($path !== 'ffmpeg') return escapeshellarg($path);
         $result = Process::timeout(10)->run('ffmpeg -version 2>&1');
         return $result->successful() ? 'ffmpeg' : null;

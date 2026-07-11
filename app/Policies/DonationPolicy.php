@@ -12,9 +12,16 @@ class DonationPolicy
         return $user->can('view_any_donation');
     }
 
+    /**
+     * Super admin or donor (via donor_id or email) can view.
+     * Null-safe checks prevent errors when donor_id/email is missing.
+     */
     public function view(User $user, Donation $donation): bool
     {
-        return $user->can('view_donation') && ($user->hasRole('super_admin') || $user->id === $donation->user_id || $user->email === $donation->email);
+        return $user->can('view_donation')
+            || $user->hasRole('super_admin')
+            || ($donation->donor_id && $user->id === $donation->donor_id)
+            || ($donation->email && $user->email === $donation->email);
     }
 
     public function create(User $user): bool

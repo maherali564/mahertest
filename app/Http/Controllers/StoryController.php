@@ -15,10 +15,14 @@ class StoryController extends Controller
         ]);
     }
 
-    /** Show a single story. */
-    public function show(string $locale, string $id): View
+    /** Show a single story by slug (falls back to id for backward compatibility before migration). */
+    public function show(string $locale, string $slug): View
     {
-        $story = Story::active()->findOrFail($id);
+        $story = Story::active()->where('slug', $slug)->first();
+        if (!$story && ctype_digit($slug)) {
+            $story = Story::active()->findOrFail($slug);
+        }
+        if (!$story) abort(404);
 
         return view('stories.show', compact('story'));
     }

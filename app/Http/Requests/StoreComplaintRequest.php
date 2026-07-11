@@ -18,7 +18,7 @@ class StoreComplaintRequest extends FormRequest
             'email' => 'required|email|max:255',
             'subject' => 'required|in:donation,response,site,volunteer,other',
             'description' => 'required|string|min:20|max:5000',
-            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'consent' => 'accepted',
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Donation;
 use App\Services\Payment\PaymentService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProcessRecurringDonations extends Command
@@ -12,7 +13,6 @@ class ProcessRecurringDonations extends Command
     protected $signature = 'donations:process-recurring';
     protected $description = 'Process recurring donations that are due';
 
-    /** Find recurring donations that are due and create new payment attempts. */
     public function handle(): int
     {
         $now = now();
@@ -33,10 +33,19 @@ class ProcessRecurringDonations extends Command
         $processed = 0;
 
         foreach ($dueDonations as $original) {
+            DB::beginTransaction();
+
             try {
-                // If the original donation has a Stripe or PayPal subscription, skip — webhook handles payments
+                if (($original->failed_attempts ?? 0) >= 3) {
+                    $original->update(['is_recurring' => false]);
+                    Log::warning('Recurring donation cancelled after 3 failed attempts', ['donation_id' => $original->id]);
+                    DB::commit();
+                    continue;
+                }
+
                 if ($original->stripe_subscription_id || $original->paypal_billing_agreement_id) {
                     $this->info("Skipping donation {$original->id}: managed by external subscription");
+                    DB::commit();
                     continue;
                 }
 
@@ -79,12 +88,20 @@ class ProcessRecurringDonations extends Command
                     $donation->update(['status' => 'completed']);
                 }
 
+                $original->update(['failed_attempts' => 0]);
+
+                DB::commit();
                 $processed++;
             } catch (\Exception $e) {
+                DB::rollBack();
+
                 Log::error('Failed to process recurring donation', [
                     'original_donation_id' => $original->id,
                     'error' => $e->getMessage(),
                 ]);
+
+                $original->increment('failed_attempts');
+                $original->update(['last_attempt_at' => now()]);
             }
         }
 

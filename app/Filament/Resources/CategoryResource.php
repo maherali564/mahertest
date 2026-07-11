@@ -39,7 +39,8 @@ class CategoryResource extends Resource
                 ->relationship('parent', 'slug', fn ($query) => $query->reorder()->orderBy('id'))
                 ->getOptionLabelFromRecordUsing(fn (Category $record) => $record->getTranslation('name', app()->getLocale()) ?: $record->getTranslation('name', 'ar'))
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->rule('different:id'),
         ]);
     }
 

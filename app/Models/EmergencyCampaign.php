@@ -37,21 +37,74 @@ class EmergencyCampaign extends Model
 
     public array $translatable = ['title', 'description', 'excerpt'];
 
+    /**
+     * Country coordinate map used to derive lat/lng/code/flag/location
+     * from the selected target_country (enforced server-side).
+     */
+    private static function countryCoordinates(): array
+    {
+        return [
+            'فلسطين' => ['lat' => 31.5, 'lng' => 34.5, 'code' => 'PS', 'flag' => '🇵🇸', 'loc' => 'فلسطين - غزة'],
+            'أمريكا' => ['lat' => 37.0, 'lng' => -95.0, 'code' => 'US', 'flag' => '🇺🇸', 'loc' => 'أمريكا'],
+            'أوكرانيا' => ['lat' => 48.3, 'lng' => 31.1, 'code' => 'UA', 'flag' => '🇺🇦', 'loc' => 'أوكرانيا'],
+            'تركيا' => ['lat' => 38.9, 'lng' => 35.2, 'code' => 'TR', 'flag' => '🇹🇷', 'loc' => 'تركيا'],
+            'سوريا' => ['lat' => 34.8, 'lng' => 39.0, 'code' => 'SY', 'flag' => '🇸🇾', 'loc' => 'سوريا'],
+            'اليمن' => ['lat' => 15.5, 'lng' => 48.0, 'code' => 'YE', 'flag' => '🇾🇪', 'loc' => 'اليمن'],
+            'السودان' => ['lat' => 15.5, 'lng' => 30.0, 'code' => 'SD', 'flag' => '🇸🇩', 'loc' => 'السودان'],
+            'لبنان' => ['lat' => 33.8, 'lng' => 35.8, 'code' => 'LB', 'flag' => '🇱🇧', 'loc' => 'لبنان'],
+            'باكستان' => ['lat' => 30.3, 'lng' => 69.3, 'code' => 'PK', 'flag' => '🇵🇰', 'loc' => 'باكستان'],
+            'إندونيسيا' => ['lat' => -0.7, 'lng' => 113.9, 'code' => 'ID', 'flag' => '🇮🇩', 'loc' => 'إندونيسيا'],
+        ];
+    }
+
     protected static function booted(): void
     {
         static::creating(function ($campaign) {
             if (empty($campaign->slug)) {
                 $campaign->slug = \Illuminate\Support\Str::slug($campaign->getTranslation('title', 'ar') ?: 'campaign-' . now()->timestamp);
             }
+            $campaign->applyCoordinatesFromCountry();
+        });
+
+        static::updating(function ($campaign) {
+            if ($campaign->isDirty('target_country')) {
+                $campaign->applyCoordinatesFromCountry();
+            }
         });
 
         static::saved(function ($campaign) {
-            if ($campaign->video) {
-                $campaign->convertHevcVideo();
-                $campaign->generateVideoThumbnail();
-                $campaign->saveQuietly();
+            if ($campaign->wasChanged('video') && $campaign->video) {
+                try {
+                    $campaign->convertHevcVideo();
+                    $campaign->generateVideoThumbnail();
+                    if ($campaign->isDirty()) {
+                        $campaign->save();
+                    }
+                } catch (\Exception $e) {
+                    Log::error('EmergencyCampaign video processing failed', [
+                        'campaign_id' => $campaign->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
         });
+    }
+
+    /**
+     * Derive lat/lng/code/flag/location from target_country server-side.
+     * Ignores any client-submitted values for these derived fields.
+     */
+    private function applyCoordinatesFromCountry(): void
+    {
+        $coords = self::countryCoordinates();
+        $country = $this->target_country;
+        if (isset($coords[$country])) {
+            $this->target_latitude = $coords[$country]['lat'];
+            $this->target_longitude = $coords[$country]['lng'];
+            $this->target_country_code = $coords[$country]['code'];
+            $this->target_flag = $coords[$country]['flag'];
+            $this->target_location = $coords[$country]['loc'];
+        }
     }
 
     public function donations(): HasMany
@@ -146,6 +199,8 @@ class EmergencyCampaign extends Model
     public static function ffmpegPath(): ?string
     {
         $path = config('services.ffmpeg.path', 'ffmpeg');
+        $allowed = ['ffmpeg', '/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg'];
+        if ($path !== 'ffmpeg' && !in_array($path, $allowed, true)) return null;
         if ($path !== 'ffmpeg') return escapeshellarg($path);
         $result = Process::timeout(10)->run('ffmpeg -version 2>&1');
         return $result->successful() ? 'ffmpeg' : null;

@@ -121,7 +121,7 @@ class Project extends Model
             $legacyPaths = array_column($paths, 'path');
             $project->media()->whereNotIn('path', $legacyPaths)->delete();
 
-            if (!empty($project->videos) || $project->video_url) {
+            if (($project->wasChanged('videos') && !empty($project->videos)) || $project->wasChanged('video_url')) {
                 ProcessVideosJob::dispatch(Project::class, $project->id);
             }
         });
@@ -132,6 +132,9 @@ class Project extends Model
             }
             foreach ($project->images ?? [] as $img) {
                 Storage::disk('public')->delete($img);
+            }
+            if ($project->video_url && !str_starts_with($project->video_url, 'http')) {
+                Storage::disk('public')->delete($project->video_url);
             }
             foreach ($project->videos ?? [] as $v) {
                 Storage::disk('public')->delete($v);
@@ -155,6 +158,8 @@ class Project extends Model
     public static function ffmpegPath(): ?string
     {
         $path = config('services.ffmpeg.path', 'ffmpeg');
+        $allowed = ['ffmpeg', '/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg'];
+        if ($path !== 'ffmpeg' && !in_array($path, $allowed, true)) return null;
         if ($path !== 'ffmpeg') return escapeshellarg($path);
         $result = Process::timeout(10)->run('ffmpeg -version 2>&1');
         return $result->successful() ? 'ffmpeg' : null;

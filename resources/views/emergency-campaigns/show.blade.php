@@ -18,11 +18,11 @@
     <div class="ec-hero-content">
         <div class="ec-hero-top">
             <div class="ec-hero-logo">
-                <span>نداء</span>
+                <span>{{ app()->getLocale() === 'ar' ? 'نداء' : 'Appeal' }}</span>
             </div>
             <div class="ec-urgent-badge">
                 <span class="ec-pulse-dot"></span>
-                حملة عاجلة
+                {{ app()->getLocale() === 'ar' ? 'حملة عاجلة' : 'Urgent Campaign' }}
             </div>
         </div>
 
@@ -31,7 +31,7 @@
         <x-countdown-timer :endsAt="$campaign->ends_at" />
 
         <a href="#donate-form" class="ec-hero-donate-btn">
-            <i aria-hidden="true" class="fas fa-heart"></i> تبرع الآن
+            <i aria-hidden="true" class="fas fa-heart"></i> {{ app()->getLocale() === 'ar' ? 'تبرع الآن' : 'Donate Now' }}
         </a>
 
         <x-progress-bar
@@ -50,7 +50,7 @@
     <div class="ec-content-col">
         {{-- Campaign Story --}}
         <div class="ec-story-section">
-            <h2 class="ec-section-title">قصة الحملة</h2>
+            <h2 class="ec-section-title">{{ app()->getLocale() === 'ar' ? 'قصة الحملة' : 'Campaign Story' }}</h2>
             @if($campaign->video)
             @php $ecThumb = $campaign->video_thumbnail ?: $campaign->image; @endphp
             <div style="margin-bottom:1.5rem;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:16/9;cursor:pointer" onclick="openVideoLightbox('{{ asset('storage/'.$campaign->video) }}')">
@@ -77,13 +77,7 @@
     </div>
 </div>
 
-{{-- Trust Section --}}
-<section class="ec-trust-section">
-    <div class="ec-trust-inner">
-        <div class="ec-trust-icon"><i aria-hidden="true" class="fas fa-globe-asia"></i></div>
-        <p class="ec-trust-text">تبرعك لـ «ساهم» يضمن وصول الدعم الإنساني العاجل لمن يستحقه في أي مكان حول العالم. نحن منظمة دولية تعمل بحيادية تامة، وتقدم الإغاثة الفورية دون تمييز على أساس العرق، أو الجنس، أو الدين. بعيداً عن القيود أو التوجهات السياسية، ومن قلب المعاناة، يتحول عطاؤك معنا مباشرة إلى حياة وأمل للمتضررين والمنكوبين.</p>
-    </div>
-</section>
+
 
 {{-- Donor Wall --}}
 <x-donor-wall

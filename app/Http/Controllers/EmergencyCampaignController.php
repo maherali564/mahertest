@@ -99,12 +99,10 @@ class EmergencyCampaignController extends Controller
                 'donor_name' => $donation->donorDisplayName(),
                 'amount' => $donation->amount,
                 'currency' => $donation->currency,
-                'message' => $donation->message,
+                'message' => $donation->is_anonymous ? null : $donation->message,
                 'created_at' => $donation->created_at->diffForHumans(),
                 'country' => $donation->donor_country,
                 'city' => $donation->donor_city,
-                'latitude' => (float) $donation->donor_latitude,
-                'longitude' => (float) $donation->donor_longitude,
             ],
         ]);
     }
@@ -121,12 +119,10 @@ class EmergencyCampaignController extends Controller
                 'donor_name' => $d->donorDisplayName(),
                 'amount' => $d->amount,
                 'currency' => $d->currency,
-                'message' => $d->message,
+                'message' => $d->is_anonymous ? null : $d->message,
                 'created_at' => $d->created_at->diffForHumans(),
                 'donor_country' => $d->donor_country,
                 'donor_city' => $d->donor_city,
-                'donor_latitude' => (float) $d->donor_latitude,
-                'donor_longitude' => (float) $d->donor_longitude,
             ]);
 
         return response()->json($donations);

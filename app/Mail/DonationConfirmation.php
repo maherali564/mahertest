@@ -16,25 +16,28 @@ class DonationConfirmation extends Mailable
     public Donation $donation;
     public string $type;
 
+    protected string $appName;
+
     /** @param string $type Type of notification: instant, under_review, completed, or failed. */
     public function __construct(Donation $donation, string $type = 'completed')
     {
         $this->donation = $donation;
         $this->type = $type;
+        $this->appName = config('app.name', 'Sahem');
     }
 
     /** Set the email subject based on the notification type. */
     public function envelope(): Envelope
     {
         $subjects = [
-            'instant' => 'تم التبرع بنجاح - ' . config('app.name'),
-            'under_review' => 'تم استلام طلب التبرع - ' . config('app.name'),
-            'completed' => 'تم تأكيد التبرع - ' . config('app.name'),
-            'failed' => 'تعذر إتمام التبرع - ' . config('app.name'),
+            'instant' => __('emails.donation_subject_instant', ['name' => $this->appName]),
+            'under_review' => __('emails.donation_subject_under_review', ['name' => $this->appName]),
+            'completed' => __('emails.donation_subject_completed', ['name' => $this->appName]),
+            'failed' => __('emails.donation_subject_failed', ['name' => $this->appName]),
         ];
 
         return new Envelope(
-            subject: $subjects[$this->type] ?? 'إشعار تبرع - ' . config('app.name'),
+            subject: $subjects[$this->type] ?? __('emails.donation_subject_default', ['name' => $this->appName]),
         );
     }
 
@@ -46,11 +49,11 @@ class DonationConfirmation extends Mailable
         );
     }
 
-    /** Attach the PDF receipt if it exists in storage. */
+    /** Attach the PDF receipt if it exists and is readable. */
     public function attachments(): array
     {
         $pdfPath = storage_path('app/receipts/receipt-' . $this->donation->id . '.pdf');
-        if (file_exists($pdfPath)) {
+        if (file_exists($pdfPath) && is_readable($pdfPath)) {
             return [$pdfPath];
         }
         return [];
