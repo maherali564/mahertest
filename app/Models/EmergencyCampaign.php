@@ -74,18 +74,7 @@ class EmergencyCampaign extends Model
 
         static::saved(function ($campaign) {
             if ($campaign->wasChanged('video') && $campaign->video) {
-                try {
-                    $campaign->convertHevcVideo();
-                    $campaign->generateVideoThumbnail();
-                    if ($campaign->isDirty()) {
-                        $campaign->save();
-                    }
-                } catch (\Exception $e) {
-                    Log::error('EmergencyCampaign video processing failed', [
-                        'campaign_id' => $campaign->id,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
+                ProcessVideosJob::dispatch(EmergencyCampaign::class, $campaign->id);
             }
         });
     }
@@ -194,6 +183,16 @@ class EmergencyCampaign extends Model
         } else {
             Log::warning('EmergencyCampaign thumbnail generation failed', ['campaign_id' => $this->id, 'video' => $this->video]);
         }
+    }
+
+    public function convertHevcVideos(): void
+    {
+        $this->convertHevcVideo();
+    }
+
+    public function generateVideoThumbnails(): void
+    {
+        $this->generateVideoThumbnail();
     }
 
     public static function ffmpegPath(): ?string
