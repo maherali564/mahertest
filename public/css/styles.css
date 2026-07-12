@@ -271,7 +271,7 @@ display: none;}
 .newsletter__form { display: flex; gap: 10px; }
 .newsletter__form input { flex: 1; padding: 14px 20px; border: none; border-radius: var(--radius-sm); font-size: 1rem; font-family: var(--font-family); }
 
-.footer { background: var(--color-bg-dark); color: #F8F9FA; padding: 64px 0 0; }
+.footer { background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)); color: #F8F9FA; padding: 64px 0 0; }
 .footer__grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 40px; }
 .footer__heading { font-size: 1rem; font-weight: 700; margin-bottom: 20px; color: #F8F9FA; }
 .footer__badges { display: flex; flex-direction: column; gap: 14px; }
