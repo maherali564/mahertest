@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var td = document.getElementById('map-total-donors'); if (td) td.innerText = totalDonors;
         var icon = L.divIcon({ className: 'donor-map-icon', html: '<div class="donor-marker-container"><div class="donor-ripple"></div><div class="donor-dot"></div></div>', iconSize: [30, 30], iconAnchor: [15, 15] });
         var marker = L.marker([d.latitude, d.longitude], { icon: icon }).addTo(map);
-        marker.bindPopup('<div class="map-popup"><strong>' + d.donor_name + '</strong><br><span style="color:#F59E0B;font-weight:bold">' + d.amount + ' ' + (d.currency || 'USD') + '</span><br><small>' + (d.country || '') + (d.city ? ' - ' + d.city : '') + '</small><br><small>' + (d.created_at || '\u0627\u0644\u0622\u0646') + '</small></div>');
+        marker.bindPopup('<div class="map-popup"><strong>' + d.donor_name + '</strong><br><span style="color:#F59E0B;font-weight:bold">' + d.amount + ' ' + (d.currency || 'USD') + '</span><br><small>' + (d.country || '') + (d.city ? ' - ' + d.city : '') + '</small><br><small>' + (d.created_at || '{{ app()->getLocale() === 'ar' ? 'الآن' : 'Now' }}') + '</small></div>');
         var line = L.polyline([[d.latitude, d.longitude], [targetLat, targetLng]], { color: '#F59E0B', weight: 1.5, opacity: 0.8, dashArray: '10, 15' }).addTo(map);
         (function (l) { var o = 0; !function a() { o = (o + 0.5) % 25; l.setStyle({ dashOffset: -o }); requestAnimationFrame(a); }(); })(line);
         activeLines.push({ line: line, marker: marker, time: Date.now() });

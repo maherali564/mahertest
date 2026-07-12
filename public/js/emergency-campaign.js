@@ -3,6 +3,25 @@ class EmergencyCampaign {
         this.campaignId = campaignId;
         this.locale = locale || 'ar';
         this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        this.translations = {
+            campaignEnded: this.locale === 'ar' ? 'انتهت الحملة' : 'Campaign Ended',
+            now: this.locale === 'ar' ? 'الآن' : 'Now',
+            donorCount: this.locale === 'ar' ? '{count} متبرع' : '{count} Donors',
+            processingDonation: this.locale === 'ar' ? 'جاري التبرع...' : 'Processing donation...',
+            redirectingToPayment: this.locale === 'ar' ? 'جاري تحويلك إلى بوابة الدفع الآمن...' : 'Redirecting to secure payment...',
+            redirecting: this.locale === 'ar' ? 'جاري التحويل...' : 'Redirecting...',
+            successMessage: this.locale === 'ar' ? 'تم التبرع بنجاح! جزاك الله خيراً 🎉' : 'Donation successful! 🎉',
+            errorGeneric: this.locale === 'ar' ? 'حدث خطأ' : 'An error occurred',
+            errorTryAgain: this.locale === 'ar' ? 'حدث خطأ. حاول مرة أخرى' : 'An error occurred. Please try again',
+        };
+    }
+
+    t(key, replacements = {}) {
+        let str = this.translations[key] || key;
+        for (const [k, v] of Object.entries(replacements)) {
+            str = str.replace(`{${k}}`, v);
+        }
+        return str;
     }
 
     init() {
@@ -39,7 +58,7 @@ class EmergencyCampaign {
             const distance = new Date(endsAt).getTime() - now;
 
             if (distance < 0) {
-                container.innerHTML = '<p style="color:white;font-size:1.2rem">انتهت الحملة</p>';
+                container.innerHTML = '<p style="color:white;font-size:1.2rem">' + this.t('campaignEnded') + '</p>';
                 return;
             }
 
@@ -145,7 +164,7 @@ class EmergencyCampaign {
             <div class="ec-donor-info">
                 <strong>${this.escapeHtml(donation.donor_name)}</strong>
                 ${donation.message ? `<p class="ec-donor-message">"${this.escapeHtml(donation.message)}"</p>` : ''}
-                <small>الآن</small>
+                <small>${this.t('now')}</small>
             </div>
             <div class="ec-donor-amount">${Number(donation.amount).toLocaleString()} ${donation.currency || 'USD'}</div>
         `;
@@ -167,7 +186,7 @@ class EmergencyCampaign {
     updateDonorCount(count) {
         const badge = document.getElementById('donor-count-badge');
         if (badge) {
-            badge.innerHTML = `<span class="ec-live-dot"></span> ${count} متبرع`;
+            badge.innerHTML = `<span class="ec-live-dot"></span> ${this.t('donorCount', {count})}`;
         }
     }
 
@@ -200,7 +219,7 @@ class EmergencyCampaign {
             const originalText = btn.innerHTML;
 
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التبرع...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + this.t('processingDonation');
 
             try {
                 const formData = new FormData(form);
@@ -218,9 +237,9 @@ class EmergencyCampaign {
 
                 if (result.success) {
                     if (result.checkout_url) {
-                        this.showToast('جاري تحويلك إلى بوابة الدفع الآمن...', 'success');
+                        this.showToast(this.t('redirectingToPayment'), 'success');
                         btn.disabled = true;
-                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + this.t('redirecting');
                         window.location.href = result.checkout_url;
                         return;
                     }
@@ -232,7 +251,7 @@ class EmergencyCampaign {
                     document.getElementById('donation-currency').value = 'USD';
                     this.updateProgress(result.progress_percent, result.new_total);
                     this.updateDonorCount(result.donor_count);
-                    this.showToast('تم التبرع بنجاح! جزاك الله خيراً 🎉', 'success');
+                    this.showToast(this.t('successMessage'), 'success');
                     if (result.donation) {
                         this.addDonorToWall(result.donation);
                         if (typeof window.addDonor === 'function') {
@@ -240,10 +259,10 @@ class EmergencyCampaign {
                         }
                     }
                 } else {
-                    this.showToast(result.message || 'حدث خطأ', 'error');
+                    this.showToast(result.message || this.t('errorGeneric'), 'error');
                 }
             } catch (error) {
-                this.showToast('حدث خطأ. حاول مرة أخرى', 'error');
+                this.showToast(this.t('errorTryAgain'), 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
