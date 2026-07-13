@@ -1,5 +1,5 @@
-@php $s = $settings ?? \App\Models\SiteSetting::current(); @endphp
 <footer class="footer">
+    @php $s = $settings; @endphp
     <div class="container">
         <div class="footer__grid">
             <div class="footer__col footer__col--brand">
@@ -12,7 +12,7 @@
                     }
                 @endphp
                 @if($logoSrc)
-                    <img loading="lazy" src="{{ asset('storage/'.$logoSrc) }}" alt="{{ app()->getLocale() === 'ar' ? 'ساهم' : 'Sahem' }}" class="footer__logo">
+                    <img loading="lazy" src="{{ asset('storage/'.$logoSrc) }}" alt="{{ app()->getLocale() === 'ar' ? 'ساهم' : 'Sahem' }}" class="footer__logo" width="200" height="160">
                 @else
                     <div class="footer__logo-text">{{ app()->getLocale() === 'ar' ? 'ساهم' : 'Sahem' }}</div>
                 @endif

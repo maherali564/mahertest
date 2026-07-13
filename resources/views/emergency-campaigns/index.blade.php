@@ -34,7 +34,7 @@
             <article class="emergency-card" data-status="active">
                 <div class="emergency-card__image">
                     @if($campaign->image)
-                    <img loading="lazy" src="{{ asset('storage/'.$campaign->image) }}" alt="{{ trans_field($campaign, 'title') }}">
+                    <img loading="lazy" src="{{ asset('storage/'.$campaign->image) }}" alt="{{ trans_field($campaign, 'title') }}" width="280" height="200">
                     @else
                     <div style="height:200px;background:linear-gradient(135deg,var(--color-danger),#c0392b);display:flex;align-items:center;justify-content:center;color:#fff;font-size:3rem"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i></div>
                     @endif
@@ -62,7 +62,7 @@
             <article class="emergency-card" data-status="completed" style="opacity:.75">
                 <div class="emergency-card__image">
                     @if($campaign->image)
-                    <img loading="lazy" src="{{ asset('storage/'.$campaign->image) }}" alt="{{ trans_field($campaign, 'title') }}">
+                    <img loading="lazy" src="{{ asset('storage/'.$campaign->image) }}" alt="{{ trans_field($campaign, 'title') }}" width="280" height="200">
                     @else
                     <div style="height:200px;background:linear-gradient(135deg,#94a3b8,#64748b);display:flex;align-items:center;justify-content:center;color:#fff;font-size:3rem"><i aria-hidden="true" class="fas fa-check-circle"></i></div>
                     @endif

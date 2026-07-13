@@ -33,7 +33,7 @@
             @endif
         </div>
         @elseif($story->image)
-        <img loading="lazy" src="{{ asset('storage/'.$story->image) }}" alt="" class="story__image" style="max-width:100%;border-radius:12px;margin:1.5rem 0">
+        <img loading="lazy" src="{{ asset('storage/'.$story->image) }}" alt="" class="story__image" width="800" height="450" style="max-width:100%;border-radius:12px;margin:1.5rem 0">
         @endif
 
         @if($story->video_url)

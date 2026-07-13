@@ -37,7 +37,7 @@
             <article style="background:var(--color-bg);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
                 <a href="{{ route('posts.show', ['locale' => app()->getLocale(), 'slug' => $post->slug]) }}">
                     @if($post->featured_image)
-                    <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ trans_field($post, 'title') }}" style="width:100%;height:200px;object-fit:cover;display:block" loading="lazy">
+                    <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ trans_field($post, 'title') }}" width="320" height="200" style="width:100%;height:200px;object-fit:cover;display:block" loading="lazy">
                     @else
                     <div style="width:100%;height:200px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem"><i aria-hidden="true" class="fas fa-newspaper"></i></div>
                     @endif

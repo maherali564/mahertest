@@ -1,4 +1,8 @@
 @php $isAr = app()->getLocale() === 'ar'; @endphp
+@push('leaflet')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" nonce="{{ $cspNonce ?? '' }}"></script>
+@endpush
 <div class="donation-map-section">
     <div class="map-header">
         <h2><i aria-hidden="true" class="fas fa-globe-americas"></i> {{ $isAr ? 'تبرعات من حول العالم' : 'Donations from Around the World' }}</h2>

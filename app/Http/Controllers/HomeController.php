@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmergencyCampaign;
 use App\Models\Post;
 use App\Models\Project;
 use App\Models\SiteSetting;
@@ -28,13 +29,30 @@ class HomeController extends Controller
         );
         $latestPosts = $this->blogService->getLatestPosts(3);
 
+        $emergencyCampaigns = Cache::remember('home_emergency_campaigns', 600, fn() =>
+            EmergencyCampaign::where('is_active', true)
+                ->where(fn($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))
+                ->orderBy('is_featured', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->get()
+        );
+
+        $projects = Cache::remember('home_projects', 3600, fn() =>
+            Project::active()->take(6)->get()
+        );
+
+        $stories = Cache::remember('home_stories', 3600, fn() =>
+            Story::active()->take(6)->get()
+        );
+
         return view('home', [
             'settings' => $settings,
             'sliders' => $sliders,
             'achievementStats' => $achievementStats,
             'humanitarianStats' => $humanitarianStats,
-            'projects' => Project::active()->take(6)->get(),
-            'stories' => Story::active()->take(6)->get(),
+            'emergencyCampaigns' => $emergencyCampaigns,
+            'projects' => $projects,
+            'stories' => $stories,
             'latestPosts' => $latestPosts,
         ]);
     }

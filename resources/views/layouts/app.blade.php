@@ -31,12 +31,50 @@
         }
     }
     </script>
+    <style nonce="{{ $cspNonce }}">
+    *,:after,:before{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;scroll-padding-top:100px}
+    body{font-family:'Cairo',sans-serif;color:#1e293b;background:#fff;line-height:1.7;-webkit-font-smoothing:antialiased}
+    body.rtl{direction:rtl}body.ltr{direction:ltr}
+    a{color:inherit;text-decoration:none;transition:all 0.3s ease}
+    a:hover{color:#0d6b4f}
+    img{max-width:100%;height:auto;display:block}
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .section{padding:5rem 0}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;border:none;transition:all 0.3s ease;font-family:'Cairo',sans-serif}
+    .btn--primary{background:#0d6b4f;color:#fff}
+    .btn--outline{background:transparent;color:#0d6b4f;border:2px solid #0d6b4f}
+    .btn--sm{padding:8px 20px;font-size:.85rem}
+    .top-bar{background:#083b2b;color:#fff;font-size:.85rem;padding:8px 0}
+    .top-bar__inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+    .header{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);position:sticky;top:0;z-index:100;height:100px}
+    .header__inner{display:flex;align-items:center;justify-content:space-between;height:100%}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo__img{height:52px;width:auto;aspect-ratio:auto}
+    .logo__text strong{display:block;font-size:1.1rem;color:#1e293b;line-height:1.2}
+    .logo__text small{font-size:.75rem;color:#64748b}
+    .nav{display:flex;align-items:center;gap:24px}
+    .nav__list{display:flex;gap:20px;list-style:none}
+    .nav__link{font-size:.9rem;font-weight:600;color:#1e293b;padding:6px 0;position:relative}
+    .nav__cta{white-space:nowrap}
+    @media(max-width:1023px){.nav{display:none}}
+    .hero{position:relative;overflow:hidden;min-height:75vh;display:flex;align-items:center;color:#fff;padding:100px 0}
+    .hero__bg{position:absolute;inset:0;background-image:linear-gradient(135deg,rgba(13,107,79,.92),rgba(9,77,58,.88)),var(--hero-img,url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&q=80'));background-size:cover;background-position:center}
+    .hero__overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,107,79,.92),rgba(9,77,58,.88))}
+    @media(max-width:767px){.hero{min-height:60vh;padding:80px 0}.logo__img{height:44px}.header{height:70px}html{scroll-padding-top:70px}}
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/extra.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"></noscript>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    <link rel="preload" as="style" href="{{ asset('css/styles.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ asset('css/styles.css') }}"></noscript>
+    @if($settings && ($settings->logos[$currentLocale] ?? $settings->logo))
+    <link rel="preload" as="image" href="{{ asset('storage/'.($settings->logos[$currentLocale] ?? $settings->logo)) }}">
+    @endif
     @livewireStyles
     @stack('head')
 </head>
@@ -57,9 +95,9 @@
 
 
     @livewireScripts
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" nonce="{{ $cspNonce }}"></script>
-    <script src="{{ asset('js/main.js') }}"></script>
-    <script src="{{ asset('js/video-lightbox.js') }}"></script>
+    @stack('leaflet')
+    <script src="{{ asset('js/main.js') }}" defer></script>
+    <script src="{{ asset('js/video-lightbox.js') }}" defer></script>
     @stack('scripts')
 
     {{-- Cookie Consent Banner --}}

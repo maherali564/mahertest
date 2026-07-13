@@ -1,5 +1,5 @@
-@php $s = $settings ?? \App\Models\SiteSetting::current(); @endphp
 <header class="header" id="header">
+    @php $s = $settings; @endphp
     <div class="container header__inner">
         <a href="{{ route('home', ['locale' => $currentLocale]) }}" class="logo">
             @php
@@ -11,7 +11,7 @@
                 }
             @endphp
             @if($logoSrc)
-                <img loading="lazy" src="{{ asset('storage/'.$logoSrc) }}" alt="" class="logo__img">
+                <img src="{{ asset('storage/'.$logoSrc) }}" alt="" class="logo__img" width="200" height="113" fetchpriority="high">
             @else
                 <span class="logo__icon" aria-hidden="true">🤝</span>
             @endif
@@ -29,8 +29,7 @@
                 <li><a href="{{ route('about.index', ['locale' => $currentLocale]) }}" class="nav__link">{{ __('common.nav_about') }}</a></li>
                 <li class="nav__item nav__item--dropdown">
                     <a href="#" class="nav__link">{{ __('common.nav_programs') }} <i aria-hidden="true" class="fas fa-chevron-down nav__arrow"></i></a>
-                    @php $navPrograms = \App\Models\Program::with('projects')->active()->get(); @endphp
-                    @if($navPrograms->isNotEmpty())
+                    @if(isset($navPrograms) && $navPrograms->isNotEmpty())
                     <ul class="nav__dropdown">
                         @foreach($navPrograms as $navProgram)
                         <li class="nav__dropdown-item">

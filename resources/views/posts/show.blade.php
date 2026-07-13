@@ -19,7 +19,7 @@
     <div class="container" style="max-width:800px">
         <article style="background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);border:1px solid var(--color-border);overflow:hidden">
             @if($post->featured_image)
-            <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ trans_field($post, 'title') }}" style="width:100%;height:auto;max-height:400px;object-fit:cover;display:block" loading="lazy">
+            <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ trans_field($post, 'title') }}" width="800" height="400" style="width:100%;height:auto;max-height:400px;object-fit:cover;display:block" loading="lazy">
             @endif
 
             <div style="padding:2rem">
@@ -75,7 +75,7 @@
                 @foreach($relatedPosts as $related)
                 <a href="{{ route('posts.show', ['locale' => app()->getLocale(), 'slug' => $related->slug]) }}" style="display:block;background:var(--color-bg);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);text-decoration:none;transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
                     @if($related->featured_image)
-                    <img src="{{ asset('storage/'.$related->featured_image) }}" alt="" style="width:100%;height:120px;object-fit:cover" loading="lazy">
+                    <img src="{{ asset('storage/'.$related->featured_image) }}" alt="" width="220" height="120" style="width:100%;height:120px;object-fit:cover" loading="lazy">
                     @endif
                     <div style="padding:12px">
                         <h4 style="font-size:0.9rem;font-weight:700;color:var(--color-text);line-height:1.4;margin:0">{{ trans_field($related, 'title') }}</h4>

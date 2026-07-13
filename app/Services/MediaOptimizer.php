@@ -154,7 +154,44 @@ class MediaOptimizer
         return function ($file) use ($directory) {
             $path = $file->store($directory, 'public');
             static::compressImage($path);
-            return $path;
+            $webpPath = static::convertToWebp($path);
+            return $webpPath ?: $path;
         };
+    }
+
+    public static function convertToWebp(string $path): ?string
+    {
+        $disk = Storage::disk('public');
+        if (!$disk->exists($path) || !function_exists('imagewebp')) return null;
+
+        $fullPath = $disk->path($path);
+        $info = getimagesize($fullPath);
+        if (!$info) return null;
+
+        [$w, $h, $type] = $info;
+
+        $src = match ($type) {
+            IMAGETYPE_JPEG => @imagecreatefromjpeg($fullPath),
+            IMAGETYPE_PNG => @imagecreatefrompng($fullPath),
+            default => null,
+        };
+
+        if (!$src) return null;
+
+        $webpPath = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $fullPath);
+        if ($webpPath === $fullPath) { imagedestroy($src); return null; }
+
+        imagesavealpha($src, true);
+        $ok = imagewebp($src, $webpPath, 80);
+        imagedestroy($src);
+
+        if ($ok && file_exists($webpPath) && filesize($webpPath) < filesize($fullPath)) {
+            $disk->delete($path);
+            $relativePath = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $path);
+            return $relativePath;
+        }
+
+        @unlink($webpPath);
+        return null;
     }
 }

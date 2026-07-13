@@ -1,5 +1,5 @@
-@php $s = $settings ?? \App\Models\SiteSetting::current(); @endphp
 <div class="top-bar">
+    @php $s = $settings; @endphp
     <div class="container top-bar__inner">
         <div class="top-bar__contact">
             @if($s->phone)<a href="tel:{{ preg_replace('/\s+/', '', $s->phone) }}"><i aria-hidden="true" class="fas fa-phone"></i> {{ $s->phone }}</a>@endif

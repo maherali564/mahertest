@@ -9,6 +9,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -36,82 +37,156 @@ class ManageSiteSettings extends Page implements HasForms
 
     public ?array $data = [];
 
-    /** Fill the form with current SiteSetting data on load. */
     public function mount(): void
     {
         $this->form->fill(SiteSetting::current()->toArray());
     }
 
-    /** Build the settings form with translatable fields, images, and contact info. */
     public function form(Form $form): Form
     {
+        $locales = [
+            'ar' => ['label' => 'العربية', 'dir' => 'rtl'],
+            'en' => ['label' => 'English', 'dir' => 'ltr'],
+            'es' => ['label' => 'Español', 'dir' => 'ltr'],
+            'id' => ['label' => 'Bahasa Indonesia', 'dir' => 'ltr'],
+            'tr' => ['label' => 'Türkçe', 'dir' => 'ltr'],
+            'sv' => ['label' => 'Svenska', 'dir' => 'ltr'],
+        ];
+
+        $lbl = fn(string $key) => __("filament.pages.manage_site_settings.{$key}");
+
         return $form
             ->schema([
-                Section::make(__('filament.pages.manage_site_settings.section.identity'))->schema([
-                    static::localeTabs('site_name', __('filament.pages.manage_site_settings.site_name')),
-                    static::localeTabs('tagline', __('filament.pages.manage_site_settings.tagline')),
-                    static::localeTabs('hero_title', __('filament.pages.manage_site_settings.hero_title')),
-                    static::localeTabs('hero_subtitle', __('filament.pages.manage_site_settings.hero_subtitle'), 'textarea'),
-                    FileUpload::make('hero_image')->label(__('filament.pages.manage_site_settings.hero_image'))->image()->directory('site')->visibility('public')->nullable()->maxSize(2048)
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                        ->rules(['mimes:jpeg,png,webp', 'max:2048'])
-                        ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
-                        ->afterStateHydrated(function (FileUpload $component, $state) {
-                            if (is_string($state) && filled($state)) {
-                                $component->state([$state]);
-                            }
-                        })->removeUploadedFileButtonPosition('right'),
-                    FileUpload::make('logo')->label(__('filament.pages.manage_site_settings.logo'))->image()->directory('site')->visibility('public')->nullable()->maxSize(2048)
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                        ->rules(['mimes:jpeg,png,webp', 'max:2048'])
-                        ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
-                        ->afterStateHydrated(function (FileUpload $component, $state) {
-                            if (is_string($state) && filled($state)) {
-                                $component->state([$state]);
-                            }
-                        })->removeUploadedFileButtonPosition('right'),
-                    Tabs::make('logos_tabs')->label(__('filament.pages.manage_site_settings.per_language_logos'))->columnSpanFull()
-                        ->tabs(collect([
-                            'ar' => 'العربية', 'en' => 'English', 'es' => 'Español',
-                            'id' => 'Bahasa Indonesia', 'tr' => 'Türkçe', 'sv' => 'Svenska',
-                        ])->map(fn ($label, $locale) => Tab::make($locale)->label($label)->schema([
-                            FileUpload::make('logos.' . $locale)->label(__('filament.pages.manage_site_settings.logo'))->image()->directory('site/logos')->visibility('public')->nullable()
+
+                Tabs::make('translations')
+                    ->label(__('filament.pages.manage_site_settings.translatable_content'))
+                    ->columnSpanFull()
+                    ->tabs(collect($locales)->map(fn($meta, $locale) => Tab::make($locale)
+                        ->label($meta['label'])
+                        ->extraAttributes(['dir' => $meta['dir']])
+                        ->schema([
+                            TextInput::make("site_name.{$locale}")
+                                ->label($lbl('site_name'))
+                                ->required($locale === 'ar')
+                                ->maxLength(255)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            TextInput::make("tagline.{$locale}")
+                                ->label($lbl('tagline'))
+                                ->maxLength(255)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            TextInput::make("hero_title.{$locale}")
+                                ->label($lbl('hero_title'))
+                                ->maxLength(255)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            Textarea::make("hero_subtitle.{$locale}")
+                                ->label($lbl('hero_subtitle'))
+                                ->rows(3)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            TextInput::make("about_title.{$locale}")
+                                ->label($lbl('about_title'))
+                                ->maxLength(255)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            Textarea::make("about_content.{$locale}")
+                                ->label($lbl('about_content'))
+                                ->rows(4)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            TextInput::make("donate_title.{$locale}")
+                                ->label($lbl('donate_title'))
+                                ->maxLength(255)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            Textarea::make("donate_description.{$locale}")
+                                ->label($lbl('donate_description'))
+                                ->rows(3)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                            Textarea::make("footer_description.{$locale}")
+                                ->label($lbl('footer_description'))
+                                ->rows(3)
+                                ->extraAttributes(['dir' => $meta['dir']]),
+                        ])
+                    )->values()->all()),
+
+                Section::make($lbl('section.media'))
+                    ->schema([
+                        FileUpload::make('hero_image')
+                            ->label($lbl('hero_image'))
+                            ->image()
+                            ->directory('site')
+                            ->visibility('public')
+                            ->nullable()
+                            ->maxSize(2048)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->rules(['mimes:jpeg,png,webp', 'max:2048'])
+                            ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
+                            ->afterStateHydrated(function (FileUpload $component, $state) {
+                                if (is_string($state) && filled($state)) {
+                                    $component->state([$state]);
+                                }
+                            })
+                            ->removeUploadedFileButtonPosition('right'),
+                        FileUpload::make('about_image')
+                            ->label($lbl('about_image'))
+                            ->image()
+                            ->directory('site')
+                            ->visibility('public')
+                            ->nullable()
+                            ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
+                            ->afterStateHydrated(function (FileUpload $component, $state) {
+                                if (is_string($state) && filled($state)) {
+                                    $component->state([$state]);
+                                }
+                            })
+                            ->removeUploadedFileButtonPosition('right'),
+                        FileUpload::make('logo')
+                            ->label($lbl('default_logo'))
+                            ->helperText(__('filament.pages.manage_site_settings.default_logo_help'))
+                            ->image()
+                            ->directory('site')
+                            ->visibility('public')
+                            ->nullable()
+                            ->maxSize(2048)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->rules(['mimes:jpeg,png,webp', 'max:2048'])
+                            ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
+                            ->afterStateHydrated(function (FileUpload $component, $state) {
+                                if (is_string($state) && filled($state)) {
+                                    $component->state([$state]);
+                                }
+                            })
+                            ->removeUploadedFileButtonPosition('right'),
+                    ])->columns(2),
+
+                Section::make($lbl('section.per_language_logos'))
+                    ->schema(
+                        collect($locales)->map(fn($meta, $locale) =>
+                            FileUpload::make("logos.{$locale}")
+                                ->label($meta['label'])
+                                ->image()
+                                ->directory('site/logos')
+                                ->visibility('public')
+                                ->nullable()
                                 ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site/logos'))
-                                ->afterStateHydrated(function (FileUpload $component, $state) { if (is_string($state) && filled($state)) $component->state([$state]); })
-                                ->removeUploadedFileButtonPosition('right'),
-                        ]))->values()->all()),
-                ])->columns(1),
+                                ->afterStateHydrated(function (FileUpload $component, $state) {
+                                    if (is_string($state) && filled($state)) $component->state([$state]);
+                                })
+                                ->removeUploadedFileButtonPosition('right')
+                        )->values()->all()
+                    )->columns(3),
 
-                Section::make(__('filament.pages.manage_site_settings.section.about'))->schema([
-                    static::localeTabs('about_title', __('filament.pages.manage_site_settings.about_title')),
-                    static::localeTabs('about_content', __('filament.pages.manage_site_settings.about_content'), 'textarea'),
-                    FileUpload::make('about_image')->label(__('filament.pages.manage_site_settings.about_image'))->image()->directory('site')->visibility('public')->nullable()
-                        ->saveUploadedFileUsing(MediaOptimizer::saveUploadedImage('site'))
-                        ->afterStateHydrated(function (FileUpload $component, $state) {
-                            if (is_string($state) && filled($state)) {
-                                $component->state([$state]);
-                            }
-                        })->removeUploadedFileButtonPosition('right'),
-                ]),
-
-                Section::make(__('filament.pages.manage_site_settings.section.donations'))->schema([
-                    static::localeTabs('donate_title', __('filament.pages.manage_site_settings.donate_title')),
-                    static::localeTabs('donate_description', __('filament.pages.manage_site_settings.donate_description'), 'textarea'),
-                    static::localeTabs('footer_description', __('filament.pages.manage_site_settings.footer_description'), 'textarea'),
-                ]),
-
-                Section::make(__('filament.pages.manage_site_settings.section.contact'))->schema([
-                    TextInput::make('phone')->label(__('filament.pages.manage_site_settings.phone'))->tel(),
-                    TextInput::make('email')->label(__('filament.pages.manage_site_settings.email'))->email(),
-                    TextInput::make('whatsapp')->label(__('filament.pages.manage_site_settings.whatsapp')),
-                    TextInput::make('twitter')->label(__('filament.pages.manage_site_settings.twitter')),
-                    TextInput::make('facebook')->label(__('filament.pages.manage_site_settings.facebook')),
-                ])->columns(2),
+                Section::make($lbl('section.contact'))
+                    ->schema([
+                        TextInput::make('phone')->label($lbl('phone'))->tel(),
+                        TextInput::make('email')->label($lbl('email'))->email(),
+                        TextInput::make('whatsapp')->label($lbl('whatsapp')),
+                        TextInput::make('twitter')->label($lbl('twitter')),
+                        TextInput::make('facebook')->label($lbl('facebook')),
+                        TextInput::make('instagram')->label($lbl('instagram')),
+                        TextInput::make('linkedin')->label($lbl('linkedin')),
+                        TextInput::make('youtube')->label($lbl('youtube')),
+                    ])->columns(3),
             ])
             ->statePath('data');
     }
 
-    /** Save site settings and clean up old images. */
     public function save(): void
     {
         $setting = SiteSetting::current();

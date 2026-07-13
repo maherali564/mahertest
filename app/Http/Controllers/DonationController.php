@@ -58,9 +58,9 @@ class DonationController extends Controller
             'is_anonymous' => 'nullable|boolean',
             'is_recurring' => 'nullable|boolean',
             'recurring_interval' => 'nullable|string|in:monthly,quarterly,yearly',
-            'project_id' => 'nullable|exists:projects,id|exists:projects,id,is_active,1',
+            'project_id' => 'nullable|exists:projects,id',
             'post_id' => 'nullable|exists:posts,id',
-            'story_id' => 'nullable|exists:stories,id|exists:stories,id,is_active,1',
+            'story_id' => 'nullable|exists:stories,id',
 
             'notes' => 'nullable|string|max:2000',
         ];
@@ -125,7 +125,7 @@ class DonationController extends Controller
         }
 
         try {
-            Mail::to($donation->email)->send(new DonationConfirmation($donation, 'under_review'));
+            Mail::to($donation->email)->queue(new DonationConfirmation($donation, 'under_review'));
         } catch (\Exception $e) {
             Log::error('Donation confirmation email failed', ['donation_id' => $donation->id, 'error' => $e->getMessage()]);
         }

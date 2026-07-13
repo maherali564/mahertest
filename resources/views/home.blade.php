@@ -1,6 +1,12 @@
 @extends('layouts.app')
 @php $s = $settings; @endphp
 
+@if($sliders->isNotEmpty() && $first = $sliders->first())
+@push('head')
+<link rel="preload" as="image" href="{{ asset('storage/'.$first->image) }}" fetchpriority="high">
+@endpush
+@endif
+
 @section('content')
 {{-- Hero Slider --}}
 <section class="hero-slider" id="home">
@@ -67,7 +73,6 @@
 
 
 {{-- Emergency Campaigns --}}
-@php $emergencyCampaigns = \App\Models\EmergencyCampaign::where('is_active', true)->where(function($q){$q->whereNull('ends_at')->orWhere('ends_at','>',now());})->orderBy('is_featured','desc')->orderBy('created_at','desc')->get(); @endphp
 @if($emergencyCampaigns->isNotEmpty())
 <section class="section section--sm" style="background:#fff">
     <div class="container">
@@ -87,7 +92,7 @@
                     <article class="ec-card" style="border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.08);border-top:3px solid var(--color-danger);transition:transform .2s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
                         <div style="height:150px;overflow:hidden;position:relative">
                             @if($ec->image)
-                            <img loading="lazy" src="{{ asset('storage/'.$ec->image) }}" alt="" style="width:100%;height:100%;object-fit:cover">
+                            <img loading="lazy" src="{{ asset('storage/'.$ec->image) }}" alt="" width="280" height="150" style="width:100%;height:100%;object-fit:cover">
                             @else
                             <div style="height:100%;background:linear-gradient(135deg,var(--color-danger),#c0392b);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem"><i aria-hidden="true" class="fas fa-exclamation-triangle"></i></div>
                             @endif
@@ -272,7 +277,7 @@
             <article style="background:var(--color-bg);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--color-border);transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
                 <a href="{{ route('posts.show', ['locale' => $currentLocale, 'slug' => $post->slug]) }}">
                     @if($post->featured_image)
-                    <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ trans_field($post, 'title') }}" style="width:100%;height:180px;object-fit:cover;display:block" loading="lazy">
+                    <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ trans_field($post, 'title') }}" width="300" height="180" style="width:100%;height:180px;object-fit:cover;display:block" loading="lazy">
                     @else
                     <div style="width:100%;height:180px;background:linear-gradient(135deg,var(--color-primary),var(--color-primary-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem"><i aria-hidden="true" class="fas fa-newspaper"></i></div>
                     @endif
@@ -403,7 +408,8 @@
 @endsection
 
 @push('head')
-<link rel="stylesheet" href="{{ asset('css/swiper-bundle.min.css') }}" />
+<link rel="preload" as="style" href="{{ asset('css/swiper-bundle.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="{{ asset('css/swiper-bundle.min.css') }}"></noscript>
 <style>
 .contact__grid--rtl { flex-direction: row-reverse; }
 .contact__grid--ltr { flex-direction: row; }

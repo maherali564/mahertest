@@ -23,7 +23,7 @@
             </div>
             <div style="height:clamp(400px,50vw,600px);background:linear-gradient(135deg,var(--color-primary),var(--color-primary-dark));border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:#fff;font-size:4rem;overflow:hidden">
                 @if($settings->about_image)
-                    <img loading="lazy" src="{{ asset('storage/'.$settings->about_image) }}" alt="" style="width:100%;height:100%;object-fit:cover">
+                    <img loading="lazy" src="{{ asset('storage/'.$settings->about_image) }}" alt="" width="1200" height="600" style="width:100%;height:100%;object-fit:cover">
                 @else
                     <i aria-hidden="true" class="fas fa-hand-holding-heart"></i>
                 @endif
@@ -104,7 +104,7 @@
             @foreach($partners as $partner)
             <div style="width:160px;height:100px;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;padding:16px;box-shadow:var(--shadow-sm)">
                 @if($partner->logo)
-                    <img loading="lazy" src="{{ asset('storage/'.$partner->logo) }}" alt="{{ trans_field($partner, 'name') }}" style="max-width:100%;max-height:100%;object-fit:contain">
+                    <img loading="lazy" src="{{ asset('storage/'.$partner->logo) }}" alt="{{ trans_field($partner, 'name') }}" width="160" height="100" style="max-width:100%;max-height:100%;object-fit:contain">
                 @else
                     <span style="font-size:0.85rem;color:var(--color-text-muted);text-align:center">{{ trans_field($partner, 'name') }}</span>
                 @endif
